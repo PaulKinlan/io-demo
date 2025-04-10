@@ -1,0 +1,239 @@
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Layout */
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+#language-selection,
+#image-input {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+label {
+  margin-right: 0.5rem;
+}
+
+select,
+button,
+input[type="file"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+#image-display img {
+  display: block;
+  margin: 1rem auto;
+  max-height: 400px;
+  border: 1px solid #ddd;
+}
+
+#image-description {
+  margin-top: 1rem;
+  background-color: #eef;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+/* Carousel Styles (from projectbrief.md) */
+.carousel {
+  list-style-type: none;
+  /* container-type: size; */ /* Removed as potentially less supported/needed for basic layout */
+  /* inline-size: 100cqi 826.656px; */ /* Removed as potentially less supported/needed for basic layout */
+  /* block-size: min(60svh, 720px); */ /* Adjusted for simpler height */
+  max-height: 300px; /* Example height, adjust as needed */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 80%; /* Adjust card width as needed */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  gap: 1rem;
+  padding-inline: 1rem;
+  scroll-padding-inline: 1rem;
+  padding-block: 30px 60px;
+  /* margin-block-end: var(--size-7); */ /* Removed dependency on undefined var */
+  margin-block-end: 1rem;
+  border: 1px solid #ddd;
+  background-color: #eee;
+  border-radius: 4px;
+}
+
+.carousel li {
+  scroll-snap-align: start;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.carousel li button {
+  margin-top: 1rem;
+  align-self: flex-end;
+}
+
+/* Note: ::scroll-button pseudo-elements have limited browser support */
+/* Consider custom buttons if broader compatibility is needed */
+.carousel::scroll-button(inline-start) {
+  z-index: 20;
+  /* background: oklch(from var(--surface-1) l c h / 50%); */ /* Removed OKLCH/var dependency */
+  background: rgba(200, 200, 200, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.carousel::scroll-button(inline-end) {
+  z-index: 20;
+  /* background: oklch(from var(--surface-1) l c h / 50%); */ /* Removed OKLCH/var dependency */
+  background: rgba(200, 200, 200, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Dialog Styles */
+#answer-dialog {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+  max-width: 500px;
+}
+
+#answer-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#answer-dialog h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+#answer-dialog form {
+  display: flex;
+  flex-direction: column;
+}
+
+#answer-dialog textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#answer-dialog menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+#dialog-feedback {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  min-height: 1.5em; /* Reserve space */
+}
+
+#dialog-feedback:not(:empty) {
+  border: 1px solid;
+}
+
+#dialog-feedback.correct {
+  /* Example class */
+  border-color: green;
+  background-color: #e6ffe6;
+}
+
+#dialog-feedback.incorrect {
+  /* Example class */
+  border-color: red;
+  background-color: #ffe6e6;
+}
+
+/* New Customizable Select Styles (using native select enhancements) */
+.custom-select {
+  /* Apply base appearance to allow styling */
+  &,
+  &::picker {
+    /* Target both the select and its internal picker */
+    appearance: base-select;
+  }
+
+  /* Add custom styling */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5em 0.75em;
+  background-color: white;
+  font-size: 1rem; /* Match other inputs */
+  min-width: 150px; /* Ensure minimum width */
+  cursor: pointer;
+}
+
+/* Style the options if needed (though content is now inside <option>) */
+.custom-select option {
+  padding: 0.25em 0.5em; /* Example padding */
+}
+
+/* Translator Status Styles */
+#translator-status {
+  font-size: 0.9em;
+  min-height: 1.2em; /* Reserve space */
+}
+
+#translator-status.checking {
+  color: #888;
+}
+
+#translator-status.available {
+  color: green;
+}
+
+#translator-status.unavailable {
+  color: red;
+  font-weight: bold;
+}

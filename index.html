@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Language Learning Tool</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <h1>Language Learning Tool</h1>
+  </header>
+
+  <main>
+    <section id="setup-section">
+      <h2>Setup</h2>
+      <div id="language-selection">
+        <label for="source-language">Source Language:</label>
+        <select id="source-language" name="source-language" class="custom-select">
+          <option value="en" selected>🇬🇧 English</option>
+          <option value="fr">🇫🇷 French</option>
+          <option value="es">🇪🇸 Spanish</option>
+          <option value="de">🇩🇪 German</option>
+          <option value="jp">🇯🇵 Japanese</option>
+          <option value="pt">🇵🇹 Portuguese</option>
+        </select>
+
+        <label for="target-language">Target Language:</label>
+        <select id="target-language" name="target-language" class="custom-select">
+          <option value="en">🇬🇧 English</option>
+          <option value="fr" selected>🇫🇷 French</option>
+          <option value="es">🇪🇸 Spanish</option>
+          <option value="de">🇩🇪 German</option>
+          <option value="jp">🇯🇵 Japanese</option>
+          <option value="pt">🇵🇹 Portuguese</option>
+        </select>
+        <div id="translator-status" aria-live="polite" style="margin-left: 1rem;"></div>
+        <!-- For Translator API status -->
+      </div>
+
+      <div id="image-input">
+        <button id="camera-button">Use Camera</button>
+        <label for="file-input">Or Upload File:</label>
+        <input type="file" id="file-input" accept="image/*">
+      </div>
+    </section>
+
+    <section id="learning-section" hidden>
+      <h2>Learn</h2>
+      <div id="image-display">
+        <img id="selected-image" src="#" alt="Selected image" style="max-width: 100%; height: auto;">
+      </div>
+      <div id="image-description">
+        <h3>Description (Source Language):</h3>
+        <p id="description-text">Description will appear here...</p>
+      </div>
+      <div id="questions-area">
+        <h3>Questions (Target Language):</h3>
+        <ul id="question-carousel" class="carousel">
+          <!-- Questions will be populated by JS -->
+          <li>Loading questions...</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="answer-dialog">
+    <h3>Question:</h3>
+    <p id="dialog-question-text"></p>
+    <form method="dialog">
+      <label for="dialog-answer">Your Answer:</label>
+      <textarea id="dialog-answer" name="dialog-answer" rows="3"></textarea>
+      <div id="dialog-feedback" aria-live="polite"></div>
+      <menu>
+        <button type="reset" id="dialog-close-button">Close</button>
+        <button type="submit" id="dialog-submit-button">Submit Answer</button>
+      </menu>
+    </form>
+  </dialog>
+
+</body>
+
+</html>
