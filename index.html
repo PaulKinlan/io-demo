@@ -7,6 +7,33 @@
   <title>Language Learning Tool</title>
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/main.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <style>
+    /* Basic PEPC styling */
+    permission {
+      display: block;
+      /* Make it block for easier centering/styling */
+      background-color: #007bff;
+      /* Blue background */
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    #camera-dialog video {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #camera-dialog canvas {
+      display: none;
+      /* Hidden canvas for capture */
+    }
+  </style>
 </head>
 
 <body>
@@ -79,6 +106,29 @@
         <button type="submit" id="dialog-submit-button">Submit Answer</button>
       </menu>
     </form>
+  </dialog>
+
+  <!-- Dialog for PEPC Camera Permission -->
+  <dialog id="permission-dialog">
+    <h2>Camera Permission</h2>
+    <p>This app needs access to your camera to take a picture for language learning.</p>
+    <!-- PEPC Element -->
+    <permission type="camera microphone" id="camera-permission-element"> </permission>
+    <p id="permission-context" style="font-size: 0.9em; margin-top: 1rem;"></p>
+    <form method="dialog">
+      <button type="submit">Close</button>
+    </form>
+  </dialog>
+
+  <!-- Dialog for Camera Preview and Capture -->
+  <dialog id="camera-dialog">
+    <h2>Camera Preview</h2>
+    <video id="camera-video" autoplay playsinline></video>
+    <canvas id="camera-canvas"></canvas> <!-- Hidden canvas -->
+    <menu>
+      <button type="button" id="camera-cancel-button">Cancel</button>
+      <button type="button" id="camera-capture-button">Capture Photo</button>
+    </menu>
   </dialog>
 
 </body>
