@@ -1,31 +1,19 @@
 console.log("Language Learning Tool script loaded.");
 
 // --- DOM Elements ---
-const setupSection = document.getElementById("setup-section");
 const learningSection = document.getElementById("learning-section");
 // Use standard select elements now
 const sourceLanguageSelect = document.getElementById("source-language");
 const targetLanguageSelect = document.getElementById("target-language");
 const translatorStatusDiv = document.getElementById("translator-status");
 // Other elements
-const cameraButton = document.getElementById("camera-button");
-const fileInput = document.getElementById("file-input");
-const selectedImage = document.getElementById("selected-image");
+let selectedImage; //  = document.getElementById("selected-image");
 const descriptionText = document.getElementById("description-text");
-const questionCarousel = document.getElementById("question-carousel");
-const answerDialog = document.getElementById("answer-dialog");
-const dialogQuestionText = document.getElementById("dialog-question-text");
-const dialogAnswerTextarea = document.getElementById("dialog-answer");
-const dialogFeedback = document.getElementById("dialog-feedback");
-const dialogCloseButton = document.getElementById("dialog-close-button");
-const dialogSubmitButton = document.getElementById("dialog-submit-button");
-const dialogForm = answerDialog.querySelector("form");
-// Camera/Permission Dialog elements
-const permissionDialog = document.getElementById("permission-dialog");
+const questionSection = document.getElementById("questions");
+
 const cameraPermissionElement = document.getElementById(
   "camera-permission-element"
 );
-const permissionContext = document.getElementById("permission-context");
 const cameraDialog = document.getElementById("camera-dialog");
 const cameraVideo = document.getElementById("camera-video");
 const cameraCanvas = document.getElementById("camera-canvas");
@@ -37,7 +25,6 @@ let sourceLanguage = "en"; // Default
 let targetLanguage = "fr"; // Default
 let currentImageBlob = null; // Store image data as Blob
 let currentQuestions = [];
-let currentQuestionIndex = -1;
 let languageModel = null; // Added for on-device AI model
 let currentCameraStream = null; // To hold the active camera stream
 let currentObjectUrl = null; // To hold temporary URL for Blob preview
@@ -50,15 +37,32 @@ async function initializeApp() {
   targetLanguageSelect.value = targetLanguage;
   await checkTranslationAvailability(); // Initial check
 
+  addEventListeners();
   // Initialize the Language Model
   try {
     // Check if the API exists (now directly on window)
     if (typeof LanguageModel !== "undefined") {
+      console.log("Checking availability...");
+      const availabilty = await LanguageModel.availability({
+        expectedInputs: [{ type: "image" }],
+      });
+      console.log("LanguageModel availability:", availabilty);
+      if (availabilty !== "available") {
+        console.error("LanguageModel not available for image input.");
+        return "Error: Language Model not available for image input.";
+      }
       console.log("Attempting to create LanguageModel...");
       // Assuming multimodal input is needed based on techContext flags
       languageModel = await LanguageModel.create({
         // Use LanguageModel.create
         expectedInputs: [{ type: "image" }],
+        monitor(m) {
+          m.addEventListener("downloadprogress", (e) => {
+            console.log(
+              `Language Model: Image, Downloaded ${e.loaded} of ${e.total} bytes.`
+            );
+          });
+        },
       });
       console.log("LanguageModel created successfully.");
     } else {
@@ -75,7 +79,6 @@ async function initializeApp() {
     translatorStatusDiv.className = "unavailable";
   }
 
-  addEventListeners();
   console.log("App initialized.");
 }
 
@@ -93,9 +96,6 @@ async function checkTranslationAvailability() {
   }
 
   try {
-    // Add a small delay to allow UI to update before potentially blocking check
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
     // Check availability directly using Translator.availability()
     const availability = await Translator.availability({
       sourceLanguage: sourceLanguage,
@@ -127,15 +127,37 @@ async function checkTranslationAvailability() {
   }
 }
 
+async function checkCameraPermission() {
+  const permission = await navigator.permissions.query({
+    name: "camera",
+  });
+
+  if (permission.state === "granted") {
+    console.log("Camera permission granted.");
+    return true;
+  }
+  return false;
+}
+
+async function checkMicrophonePermission() {
+  const permission = await navigator.permissions.query({
+    name: "microphone",
+  });
+
+  if (permission.state === "granted") {
+    console.log("Microphone permission granted.");
+    return true;
+  }
+  return false;
+}
+
 // --- Event Listeners ---
 function addEventListeners() {
   // Use standard change listeners for the select elements
   sourceLanguageSelect.addEventListener("change", handleSourceLanguageChange);
   targetLanguageSelect.addEventListener("change", handleTargetLanguageChange);
-  cameraButton.addEventListener("click", handleCameraButtonClick);
-  fileInput.addEventListener("change", handleFileInputChange);
-  questionCarousel.addEventListener("click", handleCarouselClick); // Event delegation
-  dialogForm.addEventListener("submit", handleDialogSubmit);
+  //cameraButton.addEventListener("click", handleCameraButtonClick);
+
   // Camera Dialog listeners
   cameraCaptureButton.addEventListener("click", handleCameraCapture);
   cameraCancelButton.addEventListener("click", handleCameraCancel);
@@ -143,43 +165,33 @@ function addEventListeners() {
   if (cameraPermissionElement) {
     cameraPermissionElement.addEventListener(
       "promptdismiss",
-      showPermissionContextInfo
+      handleCameraButtonClick
+    );
+    cameraPermissionElement.addEventListener(
+      "promptaction",
+      handleCameraButtonClick
     );
   } else {
     console.warn("Camera permission element not found.");
   }
-  // Revoke object URL when image changes or is no longer needed
-  selectedImage.addEventListener("load", () => {
-    if (currentObjectUrl && selectedImage.src !== currentObjectUrl) {
-      URL.revokeObjectURL(currentObjectUrl);
-      console.log("Revoked previous object URL:", currentObjectUrl);
-      currentObjectUrl = null;
-    }
-  });
 }
 
 // --- Event Handlers ---
-function handleSourceLanguageChange(event) {
+async function handleSourceLanguageChange(event) {
   const newValue = event.target.value;
   if (sourceLanguage !== newValue) {
     sourceLanguage = newValue;
     console.log("Source language changed to:", sourceLanguage);
-    checkTranslationAvailability(); // Check compatibility on change
-    // Optionally clear learning section if language changes?
-    // learningSection.hidden = true;
-    // selectedImage.src = "#";
+    await checkTranslationAvailability(); // Check compatibility on change
   }
 }
 
-function handleTargetLanguageChange(event) {
+async function handleTargetLanguageChange(event) {
   const newValue = event.target.value;
   if (targetLanguage !== newValue) {
     targetLanguage = newValue;
     console.log("Target language changed to:", targetLanguage);
-    checkTranslationAvailability(); // Check compatibility on change
-    // Optionally clear learning section if language changes?
-    // learningSection.hidden = true;
-    // selectedImage.src = "#";
+    await checkTranslationAvailability(); // Check compatibility on change
   }
 }
 
@@ -187,84 +199,21 @@ function handleTargetLanguageChange(event) {
 
 async function handleCameraButtonClick() {
   console.log("Camera button clicked");
-  permissionContext.textContent = ""; // Clear previous context messages
+
+  const cameraPermission = await checkCameraPermission();
+  const microphonePermission = await checkMicrophonePermission();
+
+  if (cameraPermission && microphonePermission == false) {
+    console.log("Camera and microphone permissions not granted.");
+    return;
+  }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert("Camera access (getUserMedia) is not supported by your browser.");
     return;
   }
-  if (!navigator.permissions || !navigator.permissions.query) {
-    alert("Permissions API is not supported by your browser.");
-    // Fallback or disable camera button? For now, attempt getUserMedia directly.
-    console.warn(
-      "Permissions API not supported, attempting getUserMedia directly."
-    );
-    startCameraStream();
-    return;
-  }
 
-  try {
-    const permissionStatus = await navigator.permissions.query({
-      name: "camera",
-    });
-    console.log("Initial camera permission status:", permissionStatus.state);
-
-    // Define the handler for permission changes
-    const handlePermissionChange = () => {
-      console.log(
-        "Camera permission status changed to:",
-        permissionStatus.state
-      );
-      if (permissionStatus.state === "granted") {
-        if (permissionDialog.open) permissionDialog.close();
-        startCameraStream();
-      } else if (permissionStatus.state === "denied") {
-        if (permissionDialog.open) permissionDialog.close();
-        permissionContext.textContent =
-          "Camera access has been denied. Please enable it in your browser settings to use this feature.";
-        // Show the dialog again to make the message visible if it wasn't already
-        if (!permissionDialog.open) permissionDialog.showModal();
-      }
-      // If state becomes 'prompt' again (unlikely but possible), do nothing here,
-      // the user needs to click the button again.
-    };
-
-    // Attach the change listener *before* the initial check
-    permissionStatus.removeEventListener("change", handlePermissionChange); // Remove previous listener if any
-    permissionStatus.addEventListener("change", handlePermissionChange);
-
-    // Handle the initial state
-    if (permissionStatus.state === "granted") {
-      startCameraStream();
-    } else if (permissionStatus.state === "prompt") {
-      // Show the PEPC dialog which contains the <permission> element
-      permissionDialog.showModal();
-    } else if (permissionStatus.state === "denied") {
-      permissionContext.textContent =
-        "Camera access is denied. Please enable it in your browser settings to use this feature.";
-      permissionDialog.showModal(); // Show dialog to display the message
-    }
-  } catch (error) {
-    console.error("Error handling camera permissions:", error);
-    // Attempt direct access as a fallback if query fails?
-    // alert("Could not check camera permissions. Attempting direct access...");
-    // startCameraStream();
-    alert(`Error checking camera permissions: ${error.message}`);
-  }
-}
-
-function showPermissionContextInfo() {
-  // This is called when the user dismisses the <permission> element's prompt
-  // inside the permissionDialog.
-  if (permissionDialog.open) {
-    // Check the current state again, as it might have changed just before dismissal
-    navigator.permissions.query({ name: "camera" }).then((status) => {
-      if (status.state === "prompt") {
-        permissionContext.textContent =
-          "Camera access is needed for this feature. If you change your mind, click the camera button again.";
-      }
-    });
-  }
+  await startCameraStream();
 }
 
 async function startCameraStream() {
@@ -282,22 +231,7 @@ async function startCameraStream() {
     };
   } catch (error) {
     console.error("Error accessing camera:", error);
-    // Handle specific errors
-    if (
-      error.name === "NotAllowedError" ||
-      error.name === "PermissionDeniedError"
-    ) {
-      permissionContext.textContent =
-        "Camera access was denied. Please enable it in browser settings.";
-      if (!permissionDialog.open) permissionDialog.showModal(); // Show context if dialog closed
-    } else if (
-      error.name === "NotFoundError" ||
-      error.name === "DevicesNotFoundError"
-    ) {
-      alert("No camera found on this device.");
-    } else {
-      alert(`Error starting camera: ${error.message}`);
-    }
+
     stopCameraStream(); // Clean up if stream partially started
   }
 }
@@ -335,6 +269,7 @@ async function handleCameraCapture() {
       cameraDialog.close();
       return;
     }
+
     console.log("Photo captured as Blob:", blob);
     currentImageBlob = blob; // Store the Blob
 
@@ -342,19 +277,39 @@ async function handleCameraCapture() {
     if (currentObjectUrl) {
       URL.revokeObjectURL(currentObjectUrl); // Revoke previous URL if exists
     }
+
+    //learningSection.className = "visible"; // Show learning section
+
     currentObjectUrl = URL.createObjectURL(blob);
-    selectedImage.src = currentObjectUrl; // Update image preview
+    const newImage = new Image();
+    newImage.id = "selected-image"; // Set ID for the new image
+    newImage.src = currentObjectUrl; // Set the src to the Object URL
 
-    // Close the dialog first, allowing the image to potentially load
-    cameraDialog.close();
+    await new Promise((resolve) => {
+      newImage.onload = () => {
+        console.log("Image preview loaded.");
+        resolve();
+      };
+    });
 
-    // Check translation availability and process the Blob
+    const cameraParent = cameraVideo.parentElement;
+    cameraParent.appendChild(newImage); // Append the new image to the camera parent
+
+    //cameraVideo.style.viewTransitionName = "selected-image-transition"; // Set view
+    const transition = document.startViewTransition(async () => {
+      stopCameraStream(); // Stop tracks now
+
+      const imageParent = document.getElementById("image-display");
+
+      imageParent.append(newImage); // Append the new image to the camera parent
+      imageParent.parentElement.classList.add("visible"); // Show image display section
+
+      cameraDialog.close();
+    });
+
+    await transition.finished; // Wait for the transition to finish
+
     await checkAndProcessImage(currentImageBlob);
-
-    // Stop the stream AFTER processing is initiated (or completed)
-    // This ensures the source isn't cut off while the blob might be needed
-    // or the preview is loading. The tracks are stopped, so the camera light should go off.
-    stopCameraStream(); // Stop tracks now
   }, "image/png"); // Specify image format if needed
 }
 
@@ -364,37 +319,6 @@ function handleCameraCancel() {
   cameraDialog.close();
 }
 
-// --- File Input Handling ---
-
-function handleFileInputChange(event) {
-  const file = event.target.files[0]; // file is already a Blob
-  if (file && file.type.startsWith("image/")) {
-    console.log("Image file selected:", file.name);
-    currentImageBlob = file; // Store the File (Blob) directly
-
-    // Create an Object URL *only* for preview purposes
-    if (currentObjectUrl) {
-      URL.revokeObjectURL(currentObjectUrl); // Revoke previous URL if exists
-    }
-    currentObjectUrl = URL.createObjectURL(file);
-    selectedImage.src = currentObjectUrl; // Update image preview
-    console.log("Image preview loaded.");
-
-    // Proceed to check compatibility and process the Blob
-    checkAndProcessImage(currentImageBlob);
-  } else {
-    console.log("No valid image file selected.");
-    currentImageBlob = null;
-    selectedImage.src = "#";
-    learningSection.hidden = true;
-    // Revoke URL if selection is cleared
-    if (currentObjectUrl) {
-      URL.revokeObjectURL(currentObjectUrl);
-      currentObjectUrl = null;
-    }
-  }
-}
-
 // Helper function to avoid duplicating the check/process logic
 async function checkAndProcessImage(imageBlob) {
   if (!imageBlob) {
@@ -402,61 +326,26 @@ async function checkAndProcessImage(imageBlob) {
     return;
   }
   console.log("Checking compatibility and processing image Blob...");
-  learningSection.hidden = false; // Show learning section
+
   descriptionText.textContent = "Checking languages..."; // Initial status
 
   const canProceed = await checkTranslationAvailability();
   if (canProceed) {
-    processImage(imageBlob); // Start the AI processing with the Blob
+    await processImage(imageBlob); // Start the AI processing with the Blob
   } else {
     alert(
       "Selected language pair is not supported for translation. Please choose different languages."
     );
     // Optionally clear image/description/questions
     learningSection.hidden = true;
-    selectedImage.src = "#"; // Clear preview
+    //selectedImage.src = "#"; // Clear preview
     descriptionText.textContent = "Description will appear here...";
-    questionCarousel.innerHTML = "<li>Select a supported language pair.</li>";
     // Revoke URL if processing fails due to language
     if (currentObjectUrl) {
       URL.revokeObjectURL(currentObjectUrl);
       currentObjectUrl = null;
     }
   }
-}
-
-function handleCarouselClick(event) {
-  if (event.target.classList.contains("answer-button")) {
-    const questionIndex = parseInt(event.target.dataset.index, 10);
-    if (
-      !isNaN(questionIndex) &&
-      questionIndex >= 0 &&
-      questionIndex < currentQuestions.length
-    ) {
-      openAnswerDialog(questionIndex);
-    }
-  }
-}
-
-async function handleDialogSubmit(event) {
-  event.preventDefault();
-  const userAnswer = dialogAnswerTextarea.value.trim();
-  if (!userAnswer || currentQuestionIndex < 0) return;
-
-  console.log(
-    `Submitting answer "${userAnswer}" for question index ${currentQuestionIndex}`
-  );
-  dialogFeedback.textContent = "Evaluating...";
-  dialogFeedback.className = "";
-
-  const feedback = await getAnswerFeedback(
-    currentQuestions[currentQuestionIndex],
-    userAnswer
-  );
-  // TODO: Determine correctness based on actual feedback from Prompt API
-  const isCorrect = Math.random() > 0.5; // Placeholder
-
-  displayFeedback(feedback, isCorrect);
 }
 
 // --- Core Logic Functions ---
@@ -469,7 +358,6 @@ async function processImage(imageBlob) {
 
   // learningSection.hidden = false; // Already shown in checkAndProcessImage
   descriptionText.textContent = "Generating description...";
-  questionCarousel.innerHTML = "<li>Generating questions...</li>";
 
   // 1. Get description using the image Blob
   const description = await getImageDescription(imageBlob); // Pass Blob
@@ -478,110 +366,51 @@ async function processImage(imageBlob) {
 
   if (description && !description.startsWith("Error:")) {
     // Check for errors from getImageDescription
-    // 2. Translate description to target language
-    let translatedDescription = description; // Default to original if translation fails
-    translatorStatusDiv.textContent = "Initializing translator..."; // Update status
-    translatorStatusDiv.className = "checking";
-    try {
-      console.log(
-        `Attempting to translate description from ${sourceLanguage} to ${targetLanguage}`
-      );
-      // Use Translator.create directly
-      const translator = await Translator.create({
-        sourceLanguage: sourceLanguage,
-        targetLanguage: targetLanguage,
-        // Add monitor for download progress
-        monitor: (monitor) => {
-          monitor.addEventListener("downloadprogress", (e) => {
-            const percent = e.total
-              ? Math.round((e.loaded / e.total) * 100)
-              : 0;
-            translatorStatusDiv.textContent = `Downloading translation model: ${percent}%`;
-            translatorStatusDiv.className = "checking"; // Keep checking style during download
-            console.log(
-              `Translator model downloaded ${e.loaded} of ${e.total} bytes (${percent}%).`
-            );
-          });
-          // Optional: Add listeners for 'downloadcomplete' or 'error' if needed
-          // monitor.addEventListener('downloadcomplete', () => console.log('Translator model download complete.'));
-          // monitor.addEventListener('error', (e) => console.error('Translator model download error:', e));
-        },
-      });
-      translatedDescription = await translator.translate(description);
-      console.log("Translated description:", translatedDescription);
-      translatorStatusDiv.textContent = "Translation successful."; // Update status on success
-      translatorStatusDiv.className = "available";
-      // Optionally display the translated description somewhere?
-      // Or just use it for question generation.
-    } catch (error) {
-      console.error("Error translating description:", error);
-      translatorStatusDiv.textContent = "Translation failed."; // Update status on error
-      translatorStatusDiv.className = "unavailable";
-      // Keep original description if translation fails
-      translatedDescription = description;
-      // Optionally inform the user translation failed?
-      // alert("Could not translate the description. Questions will be based on the original.");
-    }
-
-    // 3. Generate questions based on the (potentially translated) description in the target language
-    currentQuestions = await getQuestions(
-      translatedDescription,
-      targetLanguage
-    );
-    populateCarousel(currentQuestions);
+    currentQuestions = await getQuestions(description, imageBlob);
+    populateQuestions(currentQuestions); // Populate the questions list
   } else {
-    questionCarousel.innerHTML =
-      "<li>Could not generate questions without description.</li>";
     currentQuestions = [];
   }
 }
 
-function populateCarousel(questions) {
+function populateQuestions(questions) {
   if (!questions || questions.length === 0) {
-    questionCarousel.innerHTML = "<li>No questions generated.</li>";
+    questionSection.innerHTML = "<li>No questions generated.</li>";
     return;
   }
-  questionCarousel.innerHTML = "";
+  questionSection.innerHTML = "";
   questions.forEach((q, index) => {
     const li = document.createElement("li");
-    //li.style.order = questions.length - index; //
-    li.style.zIndex = questions.length - index; // Ensure correct stacking order
-    const fig = document.createElement("figure");
-    const caption = document.createElement("figcaption");
-    caption.textContent = q;
-    const img = document.createElement("img");
-    img.src = "/images/test.png";
-    fig.appendChild(img);
-    fig.appendChild(caption);
+    li.style.viewTransitionName = `question${index}`; // Unique name for each question
+    const questionText = document.createElement("span");
+    questionText.textContent = `${q}`;
+    const deleteButton = document.createElement("button");
+    deleteButton.innerHTML = `<span class="delete">Delete</span>`;
+    deleteButton.className = "delete-button";
+    deleteButton.addEventListener("click", (event) => {
+      const parent = event.target.parentElement;
+      parent.style.viewTransitionName = `deleteQuestion`;
+      document.startViewTransition(() => {
+        parent.remove();
+        currentQuestions.splice(index, 1); // Remove question from array
+        console.log("Question deleted:", q);
+        // Optionally update the  or other UI elements
+      });
+    });
 
-    li.appendChild(fig);
-    questionCarousel.appendChild(li);
+    li.appendChild(questionText);
+    li.appendChild(deleteButton);
+
+    questionSection.appendChild(li);
+    questionSection.className = "visible"; // Show questions section
   });
-}
-
-function openAnswerDialog(questionIndex) {
-  currentQuestionIndex = questionIndex;
-  dialogQuestionText.textContent = currentQuestions[questionIndex];
-  dialogAnswerTextarea.value = "";
-  dialogFeedback.textContent = "";
-  dialogFeedback.className = "";
-  answerDialog.showModal();
-  console.log("Opened dialog for question index:", questionIndex);
-}
-
-function displayFeedback(feedback, isCorrect) {
-  dialogFeedback.textContent = feedback;
-  dialogFeedback.className = isCorrect ? "correct" : "incorrect";
 }
 
 // --- API Functions ---
 async function getImageDescription(imageBlob) {
   // Accept Blob
   console.log("getImageDescription called with image Blob:", imageBlob);
-  if (!languageModel) {
-    console.error("LanguageModel not initialized.");
-    return "Error: Language Model not available.";
-  }
+
   if (!imageBlob) {
     // Check for Blob
     console.error("No image Blob provided to getImageDescription.");
@@ -590,6 +419,26 @@ async function getImageDescription(imageBlob) {
 
   try {
     console.log("Sending image Blob to LanguageModel for description...");
+    const availabilty = await LanguageModel.availability({
+      expectedInputs: [{ type: "image" }],
+    });
+    console.log("LanguageModel availability:", availabilty);
+    if (availabilty !== "available") {
+      console.error("LanguageModel not available for image input.");
+      return "Error: Language Model not available for image input.";
+    }
+
+    languageModel = await LanguageModel.create({
+      expectedInputs: [{ type: "image" }],
+      monitor(m) {
+        m.addEventListener("downloadprogress", (e) => {
+          console.log(
+            `Language Model: Image, Downloaded ${e.loaded} of ${e.total} bytes.`
+          );
+        });
+      },
+    });
+
     // Pass the Blob directly in the content array
     const output = await languageModel.prompt([
       "describe this image",
@@ -603,8 +452,7 @@ async function getImageDescription(imageBlob) {
   }
 }
 
-async function getQuestions(description, lang) {
-  console.log(`getQuestions called for lang: ${lang}`);
+async function getQuestions(description, imageBlob) {
   if (!languageModel) {
     console.error("LanguageModel not initialized.");
     return ["Error: Language Model not available."];
@@ -614,15 +462,43 @@ async function getQuestions(description, lang) {
     return ["Error: No description provided."];
   }
 
+  const proficiency = "beginner"; // Placeholder for proficiency level
+
   try {
     console.log("Sending description to LanguageModel for questions...");
-    const prompt = `Generate between 20 and 30 questions in ${lang} based on the following description. Each question should be on a new line:\n\n${description}`;
-    const output = await languageModel.prompt([prompt]);
+    const prompt = `You are helping a person learn a language. Generate 20 to 30 questions using following image and description in <description> that will help a ${proficiency} learner understand the content. The questions should be simple and clear.`;
+    const output = await languageModel.prompt(
+      [
+        { type: "text", content: prompt },
+        { type: "image", content: await createImageBitmap(imageBlob) },
+        { type: "text", content: `<description>${description}</description>` },
+      ],
+      {
+        responseConstraint: {
+          type: "object",
+          required: ["questions"],
+          additionalProperties: false,
+          properties: {
+            questions: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+            },
+          },
+        },
+      }
+    );
     console.log("LanguageModel questions output:", output);
 
+    const generatedJSONData = JSON.parse(output).questions; // parseJavaScriptFromPromptString(output); // Assuming the output is a JSON array
+    if (!Array.isArray(generatedJSONData)) {
+      console.warn("LanguageModel returned non-array questions.");
+      return ["No questions could be generated."];
+    }
+
     // Assuming the output is a single string with newline-separated questions
-    const questions = output
-      .split("\n")
+    const questions = generatedJSONData
       .map((q) => q.trim()) // Trim whitespace
       .filter((q) => q.length > 0); // Remove empty lines
 
@@ -634,31 +510,6 @@ async function getQuestions(description, lang) {
   } catch (error) {
     console.error("Error getting questions from LanguageModel:", error);
     return [`Error generating questions: ${error.message}`];
-  }
-}
-
-async function getAnswerFeedback(question, answer) {
-  console.log(`getAnswerFeedback called for question: "${question}"`);
-  if (!languageModel) {
-    console.error("LanguageModel not initialized.");
-    return "Error: Language Model not available.";
-  }
-  if (!question || !answer) {
-    console.error("Missing question or answer for feedback.");
-    return "Error: Missing question or answer.";
-  }
-
-  try {
-    console.log("Sending question and answer to LanguageModel for feedback...");
-    // Construct a prompt asking the model to evaluate the answer
-    // The target language is implicitly handled by the context of the question/answer
-    const prompt = `Evaluate the following answer: "${answer}" for the question: "${question}". Provide brief feedback on correctness.`;
-    const output = await languageModel.prompt([prompt]);
-    console.log("LanguageModel feedback output:", output);
-    return output; // Return the raw feedback from the model
-  } catch (error) {
-    console.error("Error getting feedback from LanguageModel:", error);
-    return `Error generating feedback: ${error.message}`;
   }
 }
 

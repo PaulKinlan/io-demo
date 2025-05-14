@@ -69,60 +69,32 @@
       </div>
 
       <div id="image-input">
-        <button id="camera-button">Use Camera</button>
-        <label for="file-input">Or Upload File:</label>
-        <input type="file" id="file-input" accept="image/*">
+        <permission type="camera microphone" id="camera-permission-element">
+          Help
+        </permission>
+
       </div>
     </section>
 
-    <section id="learning-section" hidden>
-      <h2>Learn</h2>
+    <section id="learning-section">
       <div id="image-display">
-        <img id="selected-image" src="#" alt="Selected image" style="max-width: 100%; height: auto;">
       </div>
-      <div id="image-description">
-        <h3>Description (Source Language):</h3>
-        <p id="description-text">Description will appear here...</p>
+      <button interesttarget="image-description">i</button>
+      <div popover="hint" id="image-description">
+        <h3>Description:</h3>
+        <p id="description-text"></p>
       </div>
-      <div id="questions-area">
-        <h3>Questions (Target Language):</h3>
-        <ul id="question-carousel" class="carousel">
-          <!-- Questions will be populated by JS -->
-          <li>Loading questions...</li>
-        </ul>
-      </div>
+
+    </section>
+
+    <section id="questions">
+
     </section>
   </main>
 
-  <dialog id="answer-dialog">
-    <h3>Question:</h3>
-    <p id="dialog-question-text"></p>
-    <form method="dialog">
-      <label for="dialog-answer">Your Answer:</label>
-      <textarea id="dialog-answer" name="dialog-answer" rows="3"></textarea>
-      <div id="dialog-feedback" aria-live="polite"></div>
-      <menu>
-        <button type="reset" id="dialog-close-button">Close</button>
-        <button type="submit" id="dialog-submit-button">Submit Answer</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <!-- Dialog for PEPC Camera Permission -->
-  <dialog id="permission-dialog">
-    <h2>Camera Permission</h2>
-    <p>This app needs access to your camera to take a picture for language learning.</p>
-    <!-- PEPC Element -->
-    <permission type="camera microphone" id="camera-permission-element"> </permission>
-    <p id="permission-context" style="font-size: 0.9em; margin-top: 1rem;"></p>
-    <form method="dialog">
-      <button type="submit">Close</button>
-    </form>
-  </dialog>
 
   <!-- Dialog for Camera Preview and Capture -->
-  <dialog id="camera-dialog">
-    <h2>Camera Preview</h2>
+  <dialog id="camera-dialog" closedby=any>
     <video id="camera-video" autoplay playsinline></video>
     <canvas id="camera-canvas"></canvas> <!-- Hidden canvas -->
     <menu>

@@ -1054,6 +1054,49 @@ h2 {
   padding-bottom: 0.5rem;
 }
 
+:root {
+  --shadow-4: 0 -2px 5px 0 hsl(var(--shadow-color) /
+          calc(var(--shadow-strength) + 2%)),
+    0 1px 1px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 2px 2px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 3%)),
+    0 5px 5px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+    0 9px 9px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+    0 16px 16px -2px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 6%));
+}
+
+dialog#camera-dialog {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 2em;
+  position: relative;
+
+  menu {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  img#selected-image {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    width: 100%;
+    height: auto;
+    border-radius: 2em;
+  }
+}
+
+dialog#camera-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
 #language-selection,
 #image-input {
   margin-bottom: 1rem;
@@ -1082,7 +1125,6 @@ button {
   display: block;
   margin: 1rem auto;
   max-height: 400px;
-  border: 1px solid #ddd;
 }
 
 #image-description {
@@ -1102,15 +1144,211 @@ button {
   place-items: center;
 }
 
+section#learning-section {
+  visibility: hidden;
+  view-transition-name: learning-section;
+
+  position: relative;
+
+  &.visible {
+    visibility: visible;
+  }
+
+  button[interesttarget="image-description"] {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    background-color: transparent;
+    width: 2em;
+    height: 2em;
+    cursor: pointer;
+    border-color: grey solid 1px;
+    border-radius: 50%;
+    background-color: white;
+  }
+  div[popover="hint"] {
+    inset: auto;
+    position-area: bottom left;
+  }
+}
+
+section#questions {
+  display: none;
+
+  &.visible {
+    display: block;
+  }
+
+  li {
+    view-transition-class: question;
+    position: relative;
+
+    button.delete-button {
+      background: transparent
+        url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M280-120q-33%200-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0%2033-23.5%2056.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160%200h80v-360h-80v360ZM280-720v520-520Z%22%2F%3E%3C%2Fsvg%3E)
+        no-repeat 50% 50% / 70%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2rem;
+      height: 100%;
+      border: none;
+      color: black;
+      cursor: pointer;
+
+      span.delete {
+        border: 0;
+        clip: rect(1px, 1px, 1px, 1px);
+        clip-path: inset(50%);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+:root {
+  --bounce-easing: linear(
+    0,
+    0.004,
+    0.016,
+    0.035,
+    0.063,
+    0.098,
+    0.141 13.6%,
+    0.25,
+    0.391,
+    0.563,
+    0.765,
+    1,
+    0.891 40.9%,
+    0.848,
+    0.813,
+    0.785,
+    0.766,
+    0.754,
+    0.75,
+    0.754,
+    0.766,
+    0.785,
+    0.813,
+    0.848,
+    0.891 68.2%,
+    1 72.7%,
+    0.973,
+    0.953,
+    0.941,
+    0.938,
+    0.941,
+    0.953,
+    0.973,
+    1,
+    0.988,
+    0.984,
+    0.988,
+    1
+  );
+}
+
+::view-transition-old(deleteQuestion):only-child {
+  animation-duration: 0.5s;
+}
+
+::view-transition-new(deleteQuestion):only-child {
+  animation-duration: 0.5s;
+}
+
+::view-transition-group(.question) {
+  animation-timing-function: var(--bounce-easing);
+  animation-duration: 0.5s;
+}
+
+#selected-image {
+  view-transition-name: selected-image-transition;
+}
+
+::view-transition-old(selected-image-transition) {
+  --animation-timing-function: var(--bounce-easing);
+  animation-duration: 1s;
+  --animation-name: popIn;
+}
+
+::view-transition-new(selected-image-transition):only-child {
+  --animation-timing-function: var(--bounce-easing);
+  animation-duration: 1s;
+  animation-delay: 1s;
+  --wanimation-name: popIn;
+  --animation-direction: reverse;
+}
+
+/* Animation keyframes */
+@keyframes popIn {
+  0% {
+    filter: grayscale(0%);
+  }
+  100% {
+    filter: grayscale(100%);
+  }
+}
+
+@keyframes fade-to-grey {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+}
+
+@keyframes unfade-to-grey {
+  from {
+    transform: translateY(-3px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes slide-in {
   0% {
     transform: translate(-100cqi) scale(0.75);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-opacity {
+  0% {
+    opacity: 1;
   }
 }
 
 @keyframes slide-in-zindex {
   0% {
     z-index: 0;
+  }
+}
+
+@keyframes slide-in-opacity {
+  0% {
+    opacity: 0;
   }
 }
 
@@ -1235,6 +1473,20 @@ button {
   }
 
   > li figure {
+    @container scroll-state(snapped: x) {
+      border: red solid 10px;
+
+      > figcaption {
+        opacity: 1;
+      }
+    }
+
+    @container not scroll-state(snapped: x) {
+      > figcaption {
+        opacity: 0;
+      }
+    }
+
     block-size: 100cqb;
     aspect-ratio: 9 / 16;
     background: light-dark(#ccc, #444);
@@ -1269,7 +1521,9 @@ button {
 
   > li figure figcaption {
     position: absolute;
-    bottom: 0;
+    animation: slide-in-opacity linear both;
+    animation-timeline: view(x);
+    animation-range: contain;
   }
 
   > li {
@@ -1394,6 +1648,10 @@ button {
 
 permission {
   background-color: green;
+}
+
+permission::permission-icon {
+  fill: blue;
 }
 
 permission:granted {

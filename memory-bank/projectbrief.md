@@ -1,12 +1,23 @@
 # Project Brief
 
-A client-side language learning tool.
+A client-side language learning tool with two modes: Train and Test.
 
 ## Core Requirements
 
 - Take an image either from the camera or from a file
   - Use the on-device prompt API to describe the image into the user's default language.
 - The user will be able to select their source language (defaulting to their device language) and the target language (defaulting to French). It should be two customizable selects boxes. Each select should be a list of languages with a flag in. The user should be able to select the source and target language from the list.
+
+### Train mode
+
+Training mode will let a user practice their preferred language. The goal is for the tool to create a series of questions and answers based on the context of the provided image that the user will repeat back in via the microphone and be tested for correctness. The audio will be transcribed and then checked to see if it closely matches what was presented to the user. Once the user has correctly repeated the question the system will generate an answer that is correct for the context in the image. The user will then
+
+- Use train.html
+- Using the on-device prompt API, take the description of the image and create 20-30 questions in the target language.
+- Each question will be presented as a card and then when correctly repeated the card will flipped over and an accurate answer based on the question and the context of the image will be presented for the user to repeat back.
+
+### Test mode
+
 - Using the on-device prompt API, take the description of the image and create 20-30 questions in the target language. The questions should be in a `<ul> list format and should be displayed on the screen.
 
   - The <ul> will be horizontally scrollable using scroll-snap with something like this:
