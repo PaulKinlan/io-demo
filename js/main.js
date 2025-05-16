@@ -247,12 +247,12 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
     },
   });
 
-  const prompt = `For the following image and description of the image(<description>) the user is trying to answering the following question: '${questionSource}' in ${targetLanguage} language.
+  const prompt = `The user is trying to answering the following question: '${questionSource}' in ${targetLanguage} language.
 
   The question was translated as '${questionTranslated}'. 
   
-  Is the following answer (<answer>) provided by the user correct?
-  <answer>${providedAnswer}</answer>`;
+  Using the attached image and description (<description>) is the following answer (<answer>) provided by the user correct?
+  <answer lang='${targetLanguage}'>${providedAnswer}</answer>`;
 
   const output = await answerModel.prompt(
     [
@@ -284,12 +284,10 @@ function addTranslationToUI(inputText, translation, idx) {
     </div>
     <div class="answer"><!-- answer.correct / answer.incorrect -->
       <div class="incorrect">
+        <p><img src="/images/wrong.svg"> Incorrect</p>
         <p>Question: ${inputText}</p>
-
-        <p>Suggestion: </p>
-      
       </div>
-      <div class="correct">Well done <img src="/images/tick.svg"></div>
+      <div class="correct"><p><img src="/images/tick.svg">Well done!</p></div>
     </div>
   </div>
   `;

@@ -1244,7 +1244,6 @@ section#translation-section {
   grid-auto-flow: column;
   gap: var(--size-5);
   scroll-behavior: smooth;
-  height: 80vh;
 
   > div {
     scroll-snap-stop: always;
@@ -1391,6 +1390,7 @@ section#translation-section {
     scrollbar-width: none;
     scroll-behavior: smooth;
     inline-size: 80%;
+    height: 2em;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
