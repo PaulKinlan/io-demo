@@ -24,6 +24,7 @@ const cameraCanvas = document.getElementById("camera-canvas");
 const cameraCaptureButton = document.getElementById("camera-capture-button");
 
 const btnStart = document.getElementById("start");
+const cameraButton = document.getElementById("camera-button");
 
 // --- State ---
 let sourceLanguage = "en"; // Default
@@ -174,24 +175,25 @@ function addEventListeners() {
   sourceLanguageSelect.addEventListener("change", handleSourceLanguageChange);
   targetLanguageSelect.addEventListener("change", handleTargetLanguageChange);
   proficiencySelect.addEventListener("change", handleProficiencyChange);
+  cameraButton.addEventListener("click", handleCameraButtonClick);
 
   btnStart.addEventListener("click", startTranslation);
 
   // Camera Dialog listeners
   cameraCaptureButton.addEventListener("click", handleCameraCapture);
-  // PEPC listener
-  if (cameraPermissionElement) {
-    cameraPermissionElement.addEventListener(
-      "promptdismiss",
-      handleCameraButtonClick
-    );
-    cameraPermissionElement.addEventListener(
-      "promptaction",
-      handleCameraButtonClick
-    );
-  } else {
-    console.warn("Camera permission element not found.");
-  }
+  // // PEPC listener
+  // if (cameraPermissionElement) {
+  //   cameraPermissionElement.addEventListener(
+  //     "promptdismiss",
+  //     handleCameraButtonClick
+  //   );
+  //   cameraPermissionElement.addEventListener(
+  //     "promptaction",
+  //     handleCameraButtonClick
+  //   );
+  // } else {
+  //   console.warn("Camera permission element not found.");
+  // }
 }
 
 // --- Event Handlers ---

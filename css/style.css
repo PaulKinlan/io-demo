@@ -1844,24 +1844,50 @@ section#question-section {
   color: red;
   font-weight: bold;
 }
-permission {
-  display: block;
-  /* Make it block for easier centering/styling */
-  background-color: #007bff;
-  /* Blue background */
-  color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 1rem;
-}
 
 permission::permission-icon {
   fill: blue;
 }
 
+#camera-button,
+permission {
+  background-color: var(--blue-5);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-3);
+  transition: background-color 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  place-self: center;
+
+  img {
+    width: 2rem;
+    height: 2em;
+    margin-right: 1em;
+  }
+
+  &:hover {
+    background-color: var(--blue-6);
+    box-shadow: var(--shadow-2);
+  }
+}
+
+#image-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#camera-button:not(:has(~ permission:granted)) {
+  display: none;
+}
+
 permission:granted {
-  background-color: light-green;
+  display: none;
 }
 
 /* Not supported during the origin trial. */
