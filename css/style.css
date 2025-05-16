@@ -1238,20 +1238,20 @@ section#translation-section {
   font-size: var(--font-size-2);
   scroll-marker-group: before;
   list-style-type: none;
-  padding: var(--size-3);
-  scroll-padding: var(--size-3);
+  padding: 0;
+  scroll-padding: 0;
   display: grid;
   grid-auto-flow: column;
   gap: var(--size-5);
   scroll-behavior: smooth;
 
-  > div {
+  > div.translation {
     scroll-snap-stop: always;
     counter-increment: page;
     animation: count-before linear forwards;
     animation-timeline: view(x);
     animation-range: entry 50% entry 50%;
-    padding: 2em;
+    padding: var(--size-8);
     max-inline-size: initial;
     flex-shrink: 0;
     inline-size: 100cqi;
@@ -1263,18 +1263,16 @@ section#translation-section {
     border-radius: var(--radius-3);
     background-color: white;
     /* custom */
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--shadow-3);
 
     &.translation .text-question {
       height: 100%;
       width: 100%;
       .question {
         display: grid;
-        grid-template-columns: auto clamp(10ch, 15vw, 20ch);
-
         grid-template-areas:
-          "question question"
-          "input button";
+          "question input"
+          ". button";
         gap: 1em;
 
         span {
@@ -1283,9 +1281,15 @@ section#translation-section {
 
         input {
           grid-area: input;
+          background: transparent;
+          font-size: inherit;
+          border: none;
+          border-bottom: 1px solid var(--gray-6);
         }
         button {
           grid-area: button;
+          width: fit-content;
+          place-self: end;
         }
       }
 
@@ -1326,6 +1330,7 @@ section#translation-section {
       border: 1px solid light-dark(var(--gray-6), var(--surface-4));
       border-radius: var(--radius-round);
       cursor: pointer;
+
       text-decoration: none;
       -webkit-tap-highlight-color: transparent;
       transition: transform 0.3s var(--ease-spring-2),
@@ -1343,34 +1348,36 @@ section#translation-section {
   }
 
   &::scroll-button(*) {
-    background-color: var(--blue-5);
     color: white;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 80%;
     backdrop-filter: blur(10px);
     text-indent: 100vw;
     inline-size: 50px;
     block-size: 50px;
-    border-radius: 1e3px;
-    border: none;
+    backdrop-filter: blur(10px);
+    border: solid 1px var(--gray-6);
+    color: black;
     cursor: pointer;
     position: fixed;
     position-anchor: --carousel;
-    margin-inline: 30px;
+    margin: -2em;
+    border-radius: 50%;
     transition: transform 0.3s var(--ease-spring-3), opacity 0.5s var(--ease-3),
       outline-offset 0.25s var(--ease-3);
     z-index: 100001;
   }
 
   &::scroll-button(right) {
-    position-area: center span-inline-start;
+    position-area: center end;
     content: "arrow_forward" / "Next";
+    background: url(/images/chevron-right.svg) no-repeat center, var(--gray-4);
+    background-size: cover;
   }
 
   &::scroll-button(left) {
-    position-area: center span-inline-end;
+    position-area: center start;
     content: "arrow_back" / "Previous";
+    background: url(/images/chevron-left.svg) no-repeat center, var(--gray-4);
+    background-size: cover;
   }
 
   &::scroll-button(*):focus-visible {
@@ -1391,10 +1398,11 @@ section#translation-section {
     scroll-behavior: smooth;
     inline-size: 80%;
     height: 2em;
+    gap: 1em;
+    padding: 0 var(--size-3);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
-    --padding: 5px 10px;
     scroll-padding-inline: 10px;
     mask: linear-gradient(
       to right,
@@ -1408,10 +1416,6 @@ section#translation-section {
     grid-auto-columns: var(--size-3);
     grid-auto-flow: column;
     justify-self: center;
-  }
-
-  div::scroll-marker {
-    content: " ";
   }
 
   div::scroll-marker:target-current {
@@ -1438,6 +1442,7 @@ section#translation-section {
       background-color: var(--red-5);
       &::scroll-marker {
         background-color: var(--red-5);
+        outline-color: var(--red-5);
       }
     }
 
@@ -1446,6 +1451,7 @@ section#translation-section {
 
       &::scroll-marker {
         background-color: var(--green-5);
+        outline-color: var(--green-5);
       }
     }
   }
@@ -1460,8 +1466,8 @@ button[interesttarget="translator-status"] {
   top: 0.5em;
   right: 0.5em;
   background-color: transparent;
-  width: 2em;
-  height: 2em;
+  width: 1em;
+  height: 1em;
   cursor: pointer;
   border: none;
 }
@@ -1697,185 +1703,6 @@ section#question-section {
 @keyframes slide-in-opacity {
   0% {
     opacity: 0;
-  }
-}
-
-.carousel {
-  list-style-type: none;
-  container-type: size; /* Removed as potentially less supported/needed for basic layout */
-  inline-size: 100cqi; /* Removed as potentially less supported/needed for basic layout */
-  block-size: min(60svh, 720px); /* Adjusted for simpler height */
-  display: grid;
-  grid-auto-flow: column;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  gap: 1rem;
-  padding-inline: 1rem;
-  scroll-padding-inline: 1rem;
-  padding-block: 30px 60px;
-  margin-block-end: var(--size-7); /* Removed dependency on undefined var */
-  border: 1px solid #ddd;
-  background-color: #eee;
-  border-radius: 4px;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  anchor-name: --carousel;
-  background-origin: border-box;
-  background-repeat: no-repeat;
-  border-style: solid;
-  border-width: 0px;
-
-  &:before {
-    order: 0;
-    inline-size: 25cqi;
-  }
-
-  &:after {
-    order: 30;
-    inline-size: 90cqi;
-  }
-
-  &:before,
-  &::after {
-    content: "";
-    display: block;
-  }
-
-  &::scroll-button(*) {
-    z-index: 200;
-    background: oklch(from var(--surface-1) l c h / 50%);
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    position: absolute;
-    z-index: 1;
-    position-anchor: --carousel;
-    font-size: var(--font-size-3);
-    inline-size: 44px;
-    font-family: "Material Symbols Outlined";
-    line-height: 1;
-    font-variation-settings: "FILL" 0, "wght" 100, "GRAD" 0, "opsz" 24;
-    display: flex;
-    aspect-ratio: 1 / 1;
-    margin: var(--size-3);
-    place-items: center;
-    place-content: center;
-    background: none;
-    border: 1px solid var(--surface-3);
-    border-radius: var(--radius-round);
-    transition: transform 0.3s var(--ease-spring-3), opacity 0.5s var(--ease-3),
-      background-color 0.3s var(--ease-3), outline-offset 0.25s var(--ease-3);
-  }
-
-  &::scroll-button(left) {
-    z-index: 200;
-    background: oklch(from var(--surface-1) l c h / 50%);
-    /* background: rgba(200, 200, 200, 0.5); */
-    backdrop-filter: blur(10px);
-    --_inner: center span-inline-end;
-    --_inner-under: block-end span-inline-end;
-    --_inner-over: block-start span-inline-end;
-    --_outer: inline-start center;
-    --_outer-under: block-end inline-start;
-    --_outer-over: start;
-    position-area: var(--_outer);
-    content: "arrow_back" / "Scroll Left";
-  }
-
-  &::scroll-button(right) {
-    z-index: 200;
-
-    background: rgba(200, 200, 200, 0.5);
-    background: oklch(
-      from var(--surface-1) l c h / 50%
-    ); /* Removed OKLCH/var dependency */
-    backdrop-filter: blur(10px);
-    --_inner: center span-inline-start;
-    --_inner-under: block-end span-inline-start;
-    --_inner-over: block-start span-inline-start;
-    --_outer: inline-end center;
-    --_outer-under: end;
-    --_outer-over: block-start inline-end;
-    position-area: var(--_outer);
-    content: "arrow_forward" / "Scroll Right";
-  }
-
-  > li {
-    @supports (animation-timeline: view()) {
-      @media (prefers-reduced-motion: no-preference) {
-        /* animation: slide-in-zindex linear both;
-        animation-timeline: view(x);
-        animation-range: cover -75cqi contain 20cqi; */
-      }
-    }
-
-    scroll-snap-align: start;
-    container-type: scroll-state;
-    max-inline-size: var(--size-content-2);
-    padding-inline-start: var(--size-2);
-    background-origin: border-box;
-    background-repeat: no-repeat;
-    border-style: solid;
-    border-width: 0px;
-  }
-
-  > li figure {
-    @container scroll-state(snapped: x) {
-      border: red solid 10px;
-
-      > figcaption {
-        opacity: 1;
-      }
-    }
-
-    @container not scroll-state(snapped: x) {
-      > figcaption {
-        opacity: 0;
-      }
-    }
-
-    block-size: 100cqb;
-    aspect-ratio: 9 / 16;
-    background: light-dark(#ccc, #444);
-    box-shadow: var(--shadow-5);
-    border-radius: 20px;
-    overflow: clip;
-    display: flex;
-    gap: var(--size-2);
-    place-items: center;
-    position: relative;
-    z-index: 100;
-
-    @supports (animation-timeline: view()) {
-      @media (prefers-reduced-motion: no-preference) {
-        animation: slide-in linear both;
-        animation-timeline: view(x);
-        animation-range: cover -75cqi contain 20cqi;
-      }
-    }
-  }
-
-  > li figure img {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    max-inline-size: 100%;
-    background-origin: border-box;
-    background-repeat: no-repeat;
-    border-style: solid;
-    border-width: 0px;
-  }
-
-  > li figure figcaption {
-    position: absolute;
-    animation: slide-in-opacity linear both;
-    animation-timeline: view(x);
-    animation-range: contain;
-  }
-
-  > li {
-    scroll-snap-align: start;
   }
 }
 

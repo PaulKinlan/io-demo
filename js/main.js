@@ -8,9 +8,9 @@ const setupSection = document.getElementById("setup-section");
 // Use standard select elements now
 const sourceLanguageSelect = document.getElementById("source-language");
 const targetLanguageSelect = document.getElementById("target-language");
+const proficiencySelect = document.getElementById("proficiency");
 const translatorStatusDiv = document.getElementById("translator-status");
 // Other elements
-let selectedImage; //  = document.getElementById("selected-image");
 const descriptionText = document.getElementById("description-text");
 const questionSection = document.getElementById("question-section");
 const questionDiv = document.getElementById("questions");
@@ -24,16 +24,26 @@ const cameraCanvas = document.getElementById("camera-canvas");
 const cameraCaptureButton = document.getElementById("camera-capture-button");
 
 const btnStart = document.getElementById("start");
-const btnRefresh = document.getElementById("refresh");
 
 // --- State ---
 let sourceLanguage = "en"; // Default
 let targetLanguage = "fr"; // Default
+let proficiency = "beginner"; // Default
 let currentImageBlob = null; // Store image data as Blob
 let currentQuestions = [];
 let languageModel = null; // Added for on-device AI model
 let currentCameraStream = null; // To hold the active camera stream
 let currentObjectUrl = null; // To hold temporary URL for Blob preview
+
+const languageMap = {
+  en: "English",
+  fr: "French",
+  es: "Spanish",
+  pt: "Portuguese",
+  de: "German",
+  it: "Italian",
+  jp: "Japanese",
+};
 
 // --- Initialization ---
 async function initializeApp() {
@@ -41,6 +51,7 @@ async function initializeApp() {
   // Set initial select values from state
   sourceLanguageSelect.value = sourceLanguage;
   targetLanguageSelect.value = targetLanguage;
+  proficiencySelect.value = proficiency;
   await checkTranslationAvailability(); // Initial check
 
   addEventListeners();
@@ -162,6 +173,7 @@ function addEventListeners() {
   // Use standard change listeners for the select elements
   sourceLanguageSelect.addEventListener("change", handleSourceLanguageChange);
   targetLanguageSelect.addEventListener("change", handleTargetLanguageChange);
+  proficiencySelect.addEventListener("change", handleProficiencyChange);
 
   btnStart.addEventListener("click", startTranslation);
 
@@ -198,6 +210,14 @@ async function handleTargetLanguageChange(event) {
     targetLanguage = newValue;
     console.log("Target language changed to:", targetLanguage);
     await checkTranslationAvailability(); // Check compatibility on change
+  }
+}
+
+function handleProficiencyChange() {
+  const newValue = event.target.value;
+  if (proficiency !== newValue) {
+    proficiency = newValue;
+    console.log("proficiency changed to:", proficiency);
   }
 }
 
@@ -247,7 +267,7 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
     },
   });
 
-  const prompt = `The user is trying to answering the following question: '${questionSource}' in ${targetLanguage} language.
+  const prompt = `The user is trying to answering the following question: '${questionSource}' in ${languageMap[targetLanguage]} language.
 
   The question was translated as '${questionTranslated}'. 
   
@@ -263,7 +283,6 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
     {
       responseConstraint: {
         type: "boolean",
-        required: ["isAnswerCorrect"],
         additionalProperties: false,
       },
     }
@@ -279,8 +298,10 @@ function addTranslationToUI(inputText, translation, idx) {
   <div class="text-question">
   <div class="question"> 
     <span class="question-text">${translation}</span>
-    <input type="text" class="answer-input" placeholder="Your answer here..." />
-    <button class="check-answer-button">Check Answer</button>
+    <form>
+      <input type="text" class="answer-input" placeholder="Your answer here..." />
+      <button class="check-answer-button">Check</button>
+    </form
     </div>
     <div class="answer"><!-- answer.correct / answer.incorrect -->
       <div class="incorrect">
@@ -297,23 +318,31 @@ function addTranslationToUI(inputText, translation, idx) {
   translationDiv.style.viewTransitionName = "translation" + idx; // Set view transition name
 
   const liveNode = template.content.cloneNode(true);
-  liveNode
-    .querySelector(".check-answer-button")
-    .addEventListener("click", async (event) => {
-      const root = event.target.parentElement.parentElement;
-      const answerInput = root.querySelector(".answer-input");
-      const answerElement = root.querySelector(".answer");
-      const userAnswer = answerInput.value;
+  const answerButton = liveNode.querySelector(".check-answer-button");
+  const answerForm = liveNode.querySelector("form");
 
-      const isAnswerCorrect = await checkAnswer(
-        inputText,
-        translation,
-        userAnswer
-      );
-      console.log("Answer correctness:", isAnswerCorrect);
+  const answerInput = async (event) => {
+    event.preventDefault(); // Prevent form submission
+    const root = event.target.parentElement.parentElement.parentElement;
+    const answerInput = root.querySelector(".answer-input");
+    const answerElement = root.querySelector(".answer");
+    const userAnswer = answerInput.value;
 
+    const isAnswerCorrect = await checkAnswer(
+      inputText,
+      translation,
+      userAnswer
+    );
+    console.log("Answer correctness:", isAnswerCorrect);
+
+    document.startViewTransition(() => {
       answerElement.classList.add(isAnswerCorrect ? "correct" : "incorrect");
     });
+  };
+
+  answerButton.addEventListener("click", answerInput);
+  answerForm.addEventListener("submit", answerInput);
+
   translationDiv.appendChild(liveNode);
   translationSection.appendChild(translationDiv);
 }
@@ -610,16 +639,20 @@ async function getQuestions(description, imageBlob) {
     return ["Error: No description provided."];
   }
 
-  const proficiency = "beginner"; // Placeholder for proficiency level
-
   try {
     console.log("Sending description to LanguageModel for questions...");
-    const prompt = `You are helping a person who speaks ${proficiency} ${sourceLanguage} learn a language. Generate 20 to 30 questions in ${sourceLanguage} using the included image and description in <description> that will help a ${proficiency} language learner understand the content. The questions should be simple and clear, and a ${proficiency} should be able to answer them.`;
+    const prompt = `You are a language tutor helping a ${proficiency}. 
+    
+    Generate 20 to 30 questions in ${languageMap[sourceLanguage]} about the included image and description in <description>. The questions should be simple, clear and be something a ${proficiency} learner can answer.`;
     const output = await languageModel.prompt(
       [
         { type: "text", content: prompt },
         { type: "image", content: await createImageBitmap(imageBlob) },
         { type: "text", content: `<description>${description}</description>` },
+        {
+          type: "text",
+          content: `The questions MUST be in ${languageMap[sourceLanguage]}`,
+        },
       ],
       {
         responseConstraint: {
