@@ -1043,9 +1043,8 @@ main {
 section {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid #eee;
   border-radius: 8px;
-  background-color: #f9f9f9;
 }
 
 h2 {
@@ -1066,11 +1065,11 @@ h2 {
 
 dialog#camera-dialog {
   width: 100%;
-  max-width: 600px;
   margin: auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 2em;
   position: relative;
+
+  box-shadow: var(--shadow-5);
 
   menu {
     position: absolute;
@@ -1080,6 +1079,29 @@ dialog#camera-dialog {
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
+
+    button {
+      background-color: var(--blue-5);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 50%;
+      width: 5rem;
+      height: 5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-5);
+      transition: background-color 0.3s, box-shadow 0.3s;
+
+      img {
+        width: 3rem;
+        height: 3rem;
+      }
+
+      &:hover {
+        background-color: var(--blue-6);
+        box-shadow: var(--shadow-3);
+      }
+    }
   }
 
   img#selected-image {
@@ -1123,13 +1145,11 @@ button {
 
 #image-display img {
   display: block;
-  margin: 1rem auto;
-  max-height: 400px;
+  width: 100%;
 }
 
 #image-description {
   margin-top: 1rem;
-  background-color: #eef;
   padding: 1rem;
   border-radius: 4px;
 }
@@ -1144,69 +1164,397 @@ button {
   place-items: center;
 }
 
+#camera-dialog video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  width: 100%;
+}
+
+#camera-dialog canvas {
+  display: none;
+  /* Hidden canvas for capture */
+}
+
+section#setup-section {
+  position: relative;
+
+  transition: clip-path 1s var(--ease-3);
+  view-transition-name: setup-section;
+
+  ::view-transition-old(setup-section) {
+    animation-duration: 1s;
+  }
+
+  ::view-transition-new(setup-section) {
+    animation-duration: 1s;
+  }
+
+  label {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &.complete {
+    clip-path: circle(0%);
+  }
+  &.move {
+    position: absolute;
+    clip-path: circle(20%);
+    top: 0;
+    right: 0;
+    content: url(/images/config.svg);
+    background-color: rgb(146, 143, 143);
+  }
+}
+
 section#learning-section {
   visibility: hidden;
   view-transition-name: learning-section;
+  padding: 0;
 
   position: relative;
+
+  div#image-display {
+    width: 100%;
+  }
 
   &.visible {
     visibility: visible;
   }
+}
 
-  button[interesttarget="image-description"] {
-    position: absolute;
-    top: 0.5em;
-    right: 0.5em;
-    background-color: transparent;
-    width: 2em;
-    height: 2em;
-    cursor: pointer;
-    border-color: grey solid 1px;
-    border-radius: 50%;
+section#translation-section {
+  view-transition-name: translation-section;
+  border: none;
+  anchor-name: --carousel;
+  container-type: inline-size;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  font-size: var(--font-size-2);
+  scroll-marker-group: before;
+  list-style-type: none;
+  padding: var(--size-3);
+  scroll-padding: var(--size-3);
+  display: grid;
+  grid-auto-flow: column;
+  gap: var(--size-5);
+  scroll-behavior: smooth;
+  height: 80vh;
+
+  > div {
+    scroll-snap-stop: always;
+    counter-increment: page;
+    animation: count-before linear forwards;
+    animation-timeline: view(x);
+    animation-range: entry 50% entry 50%;
+    padding: 2em;
+    max-inline-size: initial;
+    flex-shrink: 0;
+    inline-size: 100cqi;
+    overflow: clip;
+    contain-intrinsic-inline-size: 100cqi;
+    content-visibility: auto;
+    container-type: scroll-state;
+    scroll-snap-align: start;
+    border-radius: var(--radius-3);
     background-color: white;
+    /* custom */
+    box-shadow: var(--shadow-2);
+
+    &.translation .text-question {
+      height: 100%;
+      width: 100%;
+      .question {
+        display: grid;
+        grid-template-columns: auto clamp(10ch, 15vw, 20ch);
+
+        grid-template-areas:
+          "question question"
+          "input button";
+        gap: 1em;
+
+        span {
+          grid-area: question;
+        }
+
+        input {
+          grid-area: input;
+        }
+        button {
+          grid-area: button;
+        }
+      }
+
+      .answer {
+        .correct {
+          display: none;
+        }
+        .incorrect {
+          display: none;
+        }
+
+        &.correct {
+          .correct {
+            display: block;
+          }
+
+          .incorrect {
+            display: none;
+          }
+        }
+
+        &.incorrect {
+          .correct {
+            display: none;
+          }
+
+          .incorrect {
+            display: block;
+          }
+        }
+      }
+    }
+
+    &::scroll-marker {
+      content: "" / attr(data-label);
+      scroll-snap-align: center;
+      aspect-ratio: 1;
+      border: 1px solid light-dark(var(--gray-6), var(--surface-4));
+      border-radius: var(--radius-round);
+      cursor: pointer;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.3s var(--ease-spring-2),
+        outline-offset 0.25s var(--ease-3);
+      animation: scale-in-and-out linear both;
+      animation-timeline: view(x);
+      interactivity: auto;
+      z-index: 100000;
+
+      &:target-current {
+        background: var(--link);
+        border-color: var(--link);
+      }
+    }
   }
-  div[popover="hint"] {
-    inset: auto;
-    position-area: bottom left;
+
+  &::scroll-button(*) {
+    background-color: var(--blue-5);
+    color: white;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 80%;
+    backdrop-filter: blur(10px);
+    text-indent: 100vw;
+    inline-size: 50px;
+    block-size: 50px;
+    border-radius: 1e3px;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    position-anchor: --carousel;
+    margin-inline: 30px;
+    transition: transform 0.3s var(--ease-spring-3), opacity 0.5s var(--ease-3),
+      outline-offset 0.25s var(--ease-3);
+    z-index: 100001;
+  }
+
+  &::scroll-button(right) {
+    position-area: center span-inline-start;
+    content: "arrow_forward" / "Next";
+  }
+
+  &::scroll-button(left) {
+    position-area: center span-inline-end;
+    content: "arrow_back" / "Previous";
+  }
+
+  &::scroll-button(*):focus-visible {
+    outline-offset: 5px;
+  }
+
+  &::scroll-marker-group {
+    position: absolute;
+    position-area: bottom center;
+    z-index: 100000;
+    position-anchor: --carousel;
+    container: marker-group / inline-size;
+    display: grid;
+    place-content: safe center;
+    box-sizing: border-box;
+    border-radius: var(--radius-round);
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    inline-size: 80%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    --padding: 5px 10px;
+    scroll-padding-inline: 10px;
+    mask: linear-gradient(
+      to right,
+      transparent 0,
+      black 10px,
+      black calc(100% - 10px),
+      transparent 100%
+    );
+
+    margin-block: var(--size-3);
+    grid-auto-columns: var(--size-3);
+    grid-auto-flow: column;
+    justify-self: center;
+  }
+
+  div::scroll-marker {
+    content: " ";
+  }
+
+  div::scroll-marker:target-current {
+    background-color: var(--blue-10);
+    border-color: var(--blue-10);
+    transform: scale(1.5);
+    transition: transform 0.3s var(--ease-spring-2),
+      color 0.3s var(--ease-spring-2);
+  }
+
+  flex-direction: row;
+
+  display: none;
+
+  &.visible {
+    display: flex;
+  }
+
+  div.translation {
+    background: white;
+    transition: background-color 0.3s ease-in-out;
+
+    &:has(div.text-question .answer.incorrect) {
+      background-color: var(--red-5);
+      &::scroll-marker {
+        background-color: var(--red-5);
+      }
+    }
+
+    &:has(div.text-question .answer.correct) {
+      background-color: var(--green-5);
+
+      &::scroll-marker {
+        background-color: var(--green-5);
+      }
+    }
   }
 }
 
-section#questions {
+button[interesttarget="image-description"],
+button[interesttarget="translator-status"] {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0.5em;
+  right: 0.5em;
+  background-color: transparent;
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+  border: none;
+}
+button[interesttarget="image-description"] {
+  color: var(--gray-6);
+  transition: color 0.3s, background-color 0.3s;
+
+  &:hover {
+    background-color: var(--gray-5);
+    color: var(--gray-12);
+  }
+}
+div[popover="hint"] {
+  inset: auto;
+  max-width: 30ch;
+  max-height: 30ch;
+  overflow-y: auto;
+  position-area: bottom left;
+  background-color: white;
+}
+
+section#question-section {
   display: none;
 
   &.visible {
     display: block;
   }
 
-  li {
-    view-transition-class: question;
-    position: relative;
+  menu {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 
-    button.delete-button {
-      background: transparent
-        url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M280-120q-33%200-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0%2033-23.5%2056.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160%200h80v-360h-80v360ZM280-720v520-520Z%22%2F%3E%3C%2Fsvg%3E)
-        no-repeat 50% 50% / 70%;
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 2rem;
-      height: 100%;
+    button {
+      background-color: var(--blue-5);
+      color: white;
       border: none;
-      color: black;
+      padding: 0.5rem 1rem;
+      border-radius: 50%;
+      width: 5rem;
+      height: 5rem;
       cursor: pointer;
+      box-shadow: var(--shadow-5);
+      transition: background-color 0.3s, box-shadow 0.3s;
 
-      span.delete {
-        border: 0;
-        clip: rect(1px, 1px, 1px, 1px);
-        clip-path: inset(50%);
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        padding: 0;
+      img {
+        width: 3rem;
+        height: 3rem;
+      }
+
+      &:hover {
+        background-color: var(--blue-6);
+        box-shadow: var(--shadow-2);
+      }
+    }
+  }
+
+  div#questions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+
+    li {
+      view-transition-class: question;
+      position: relative;
+
+      button.delete-button {
+        background: transparent
+          url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224px%22%20viewBox%3D%220%20-960%20960%20960%22%20width%3D%2224px%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M280-120q-33%200-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0%2033-23.5%2056.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160%200h80v-360h-80v360ZM280-720v520-520Z%22%2F%3E%3C%2Fsvg%3E)
+          no-repeat 50% 50% / 70%;
         position: absolute;
-        width: 1px;
-        white-space: nowrap;
+        top: 0;
+        right: 0;
+        width: 2rem;
+        height: 100%;
+        border: none;
+        color: black;
+        cursor: pointer;
+
+        span.delete {
+          border: 0;
+          clip: rect(1px, 1px, 1px, 1px);
+          clip-path: inset(50%);
+          height: 1px;
+          margin: -1px;
+          overflow: hidden;
+          padding: 0;
+          position: absolute;
+          width: 1px;
+          white-space: nowrap;
+        }
       }
     }
   }
@@ -1531,11 +1879,6 @@ section#questions {
   }
 }
 
-/* .carousel li button {
-  margin-top: 1rem;
-  align-self: flex-end;
-} */
-
 /* Note: ::scroll-button pseudo-elements have limited browser support */
 /* Consider custom buttons if broader compatibility is needed */
 
@@ -1607,19 +1950,48 @@ section#questions {
 .custom-select {
   /* Apply base appearance to allow styling */
   &,
-  &::picker {
-    /* Target both the select and its internal picker */
+  &::picker(select) {
     appearance: base-select;
+    border: none;
+    padding: 0.5rem 0;
+    overflow-x: hidden;
+    border-radius: 5px;
+    transition: width 0.5s;
+    /*  resets from UA  */
+    min-inline-size: 0;
+    --width: auto;
+    box-shadow: 0px 12.8px 28.8px rgba(0, 0, 0, 0.13),
+      0px 0px 9.2px rgba(0, 0, 0, 0.11);
   }
 
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+  transition-duration: 0.25s;
+  align-items: center;
+
+  appearance: base-select;
   /* Add custom styling */
-  border: 1px solid #ccc;
-  border-radius: 4px;
+
   padding: 0.5em 0.75em;
   background-color: white;
   font-size: 1rem; /* Match other inputs */
   min-width: 150px; /* Ensure minimum width */
   cursor: pointer;
+
+  &:open {
+    background-color: #f0f0f0; /* Change background on open */
+    width: 100%;
+  }
+
+  option {
+    padding-bottom: 1em;
+    border-bottom: 1px dotted var(--green-3);
+    img {
+      width: 64px;
+      height: 64px;
+    }
+  }
 }
 
 /* Style the options if needed (though content is now inside <option>) */
@@ -1645,9 +2017,16 @@ section#questions {
   color: red;
   font-weight: bold;
 }
-
 permission {
-  background-color: green;
+  display: block;
+  /* Make it block for easier centering/styling */
+  background-color: #007bff;
+  /* Blue background */
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 permission::permission-icon {

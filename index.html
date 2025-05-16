@@ -8,87 +8,71 @@
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/main.js" defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
-  <style>
-    /* Basic PEPC styling */
-    permission {
-      display: block;
-      /* Make it block for easier centering/styling */
-      background-color: #007bff;
-      /* Blue background */
-      color: white;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    #camera-dialog video {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    #camera-dialog canvas {
-      display: none;
-      /* Hidden canvas for capture */
-    }
-  </style>
 </head>
 
 <body>
-  <header>
-    <h1>Language Learning Tool</h1>
-  </header>
 
   <main>
+
     <section id="setup-section">
-      <h2>Setup</h2>
-      <div id="language-selection">
-        <label for="source-language">Source Language:</label>
-        <select id="source-language" name="source-language" class="custom-select">
+      <label for="source-language">My Language: <select id="source-language" name="source-language"
+          class="custom-select">
           <option value="en" selected>🇬🇧 English</option>
           <option value="fr">🇫🇷 French</option>
           <option value="es">🇪🇸 Spanish</option>
           <option value="de">🇩🇪 German</option>
           <option value="jp">🇯🇵 Japanese</option>
           <option value="pt">🇵🇹 Portuguese</option>
-        </select>
-
-        <label for="target-language">Target Language:</label>
-        <select id="target-language" name="target-language" class="custom-select">
+        </select></label>
+      <label for="target-language">Language to practice: <select id="target-language" name="target-language"
+          class="custom-select">
           <option value="en">🇬🇧 English</option>
           <option value="fr" selected>🇫🇷 French</option>
           <option value="es">🇪🇸 Spanish</option>
           <option value="de">🇩🇪 German</option>
           <option value="jp">🇯🇵 Japanese</option>
           <option value="pt">🇵🇹 Portuguese</option>
-        </select>
-        <div id="translator-status" aria-live="polite" style="margin-left: 1rem;"></div>
-        <!-- For Translator API status -->
-      </div>
+        </select></label>
+
+      <button interesttarget="translator-status"><img src="/images/info.svg"></button>
+      <div popover="hint" id="translator-status"></div>
+
+      <label for="proficiency">Proficiency: <select id="proficiency" name="proficiency" class="custom-select">
+          <option value="noob"><img src="https://paul.kinlan.me/images/me.png"><span>Brit</span></option>
+          <option value="beginner" selected><img src="/images/school.svg"><span>Beginner</span></option>
+          <option value="intermediate"><img src="/images/owl.svg">Intermediate</option>
+          <option value="advanced"><img src="/images/school.svg">Advanced</option>
+          <option value="native"><img src="/images/cognition.svg">
+            Natural</option>
+        </select></label>
 
       <div id="image-input">
         <permission type="camera microphone" id="camera-permission-element">
           Help
         </permission>
-
       </div>
+
     </section>
 
     <section id="learning-section">
       <div id="image-display">
       </div>
-      <button interesttarget="image-description">i</button>
+      <button interesttarget="image-description"><img src="/images/info.svg"></button>
       <div popover="hint" id="image-description">
-        <h3>Description:</h3>
         <p id="description-text"></p>
       </div>
 
     </section>
 
-    <section id="questions">
+    <section id="question-section">
+      <div id="questions"></div>
+      <menu>
+        <button id="start"><img src="/images/go.svg"></button>
+        <button id="redo"><img src="/images/refresh.svg"></button>
+      </menu>
+    </section>
 
+    <section id="translation-section">
     </section>
   </main>
 
@@ -98,8 +82,7 @@
     <video id="camera-video" autoplay playsinline></video>
     <canvas id="camera-canvas"></canvas> <!-- Hidden canvas -->
     <menu>
-      <button type="button" id="camera-cancel-button">Cancel</button>
-      <button type="button" id="camera-capture-button">Capture Photo</button>
+      <button type="button" id="camera-capture-button"><img src="/images/camera.svg"></button>
     </menu>
   </dialog>
 

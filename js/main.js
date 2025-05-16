@@ -2,6 +2,9 @@ console.log("Language Learning Tool script loaded.");
 
 // --- DOM Elements ---
 const learningSection = document.getElementById("learning-section");
+const translationSection = document.getElementById("translation-section");
+
+const setupSection = document.getElementById("setup-section");
 // Use standard select elements now
 const sourceLanguageSelect = document.getElementById("source-language");
 const targetLanguageSelect = document.getElementById("target-language");
@@ -9,7 +12,8 @@ const translatorStatusDiv = document.getElementById("translator-status");
 // Other elements
 let selectedImage; //  = document.getElementById("selected-image");
 const descriptionText = document.getElementById("description-text");
-const questionSection = document.getElementById("questions");
+const questionSection = document.getElementById("question-section");
+const questionDiv = document.getElementById("questions");
 
 const cameraPermissionElement = document.getElementById(
   "camera-permission-element"
@@ -17,8 +21,10 @@ const cameraPermissionElement = document.getElementById(
 const cameraDialog = document.getElementById("camera-dialog");
 const cameraVideo = document.getElementById("camera-video");
 const cameraCanvas = document.getElementById("camera-canvas");
-const cameraCancelButton = document.getElementById("camera-cancel-button");
 const cameraCaptureButton = document.getElementById("camera-capture-button");
+
+const btnStart = document.getElementById("start");
+const btnRefresh = document.getElementById("refresh");
 
 // --- State ---
 let sourceLanguage = "en"; // Default
@@ -156,11 +162,11 @@ function addEventListeners() {
   // Use standard change listeners for the select elements
   sourceLanguageSelect.addEventListener("change", handleSourceLanguageChange);
   targetLanguageSelect.addEventListener("change", handleTargetLanguageChange);
-  //cameraButton.addEventListener("click", handleCameraButtonClick);
+
+  btnStart.addEventListener("click", startTranslation);
 
   // Camera Dialog listeners
   cameraCaptureButton.addEventListener("click", handleCameraCapture);
-  cameraCancelButton.addEventListener("click", handleCameraCancel);
   // PEPC listener
   if (cameraPermissionElement) {
     cameraPermissionElement.addEventListener(
@@ -195,6 +201,124 @@ async function handleTargetLanguageChange(event) {
   }
 }
 
+async function startTranslation() {
+  console.log("Starting translation...");
+
+  const canProceed = await checkTranslationAvailability();
+  if (!canProceed) {
+    alert(
+      "Selected language pair is not supported for translation. Please choose different languages."
+    );
+    return;
+  }
+
+  const translator = await Translator.create({
+    sourceLanguage: sourceLanguage,
+    targetLanguage: targetLanguage,
+  });
+  console.log("Translator initialized:", translator);
+  let idx = 0;
+
+  for (const question of currentQuestions) {
+    console.log("Translating question:", question);
+    const translation = await translator.translate(question);
+    console.log("Translation result:", translation);
+    addTranslationToUI(question, translation, idx++);
+  }
+
+  document.startViewTransition(() => {
+    translationSection.classList.add("visible");
+    questionSection.classList.remove("visible");
+  });
+}
+
+async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
+  // It's a hack to be pulling from the DOM, but this is a demo.
+  const description = `<description>${descriptionText.textContent}</description>`;
+
+  const answerModel = await LanguageModel.create({
+    expectedInputs: [{ type: "text" }, { type: "image" }],
+    monitor(m) {
+      m.addEventListener("downloadprogress", (e) => {
+        console.log(
+          `Language Model: Text, Downloaded ${e.loaded} of ${e.total} bytes.`
+        );
+      });
+    },
+  });
+
+  const prompt = `For the following image and description of the image(<description>) the user is trying to answering the following question: '${questionSource}' in ${targetLanguage} language.
+
+  The question was translated as '${questionTranslated}'. 
+  
+  Is the following answer (<answer>) provided by the user correct?
+  <answer>${providedAnswer}</answer>`;
+
+  const output = await answerModel.prompt(
+    [
+      { type: "text", content: prompt },
+      { type: "image", content: await createImageBitmap(currentImageBlob) },
+      { type: "text", content: description },
+    ],
+    {
+      responseConstraint: {
+        type: "boolean",
+        required: ["isAnswerCorrect"],
+        additionalProperties: false,
+      },
+    }
+  );
+
+  console.log("Answer Model output:", output);
+  return JSON.parse(output);
+}
+
+function addTranslationToUI(inputText, translation, idx) {
+  const template = document.createElement("template");
+  template.innerHTML = `
+  <div class="text-question">
+  <div class="question"> 
+    <span class="question-text">${translation}</span>
+    <input type="text" class="answer-input" placeholder="Your answer here..." />
+    <button class="check-answer-button">Check Answer</button>
+    </div>
+    <div class="answer"><!-- answer.correct / answer.incorrect -->
+      <div class="incorrect">
+        <p>Question: ${inputText}</p>
+
+        <p>Suggestion: </p>
+      
+      </div>
+      <div class="correct">Well done <img src="/images/tick.svg"></div>
+    </div>
+  </div>
+  `;
+
+  const translationDiv = document.createElement("div");
+  translationDiv.className = "translation";
+  translationDiv.style.viewTransitionName = "translation" + idx; // Set view transition name
+
+  const liveNode = template.content.cloneNode(true);
+  liveNode
+    .querySelector(".check-answer-button")
+    .addEventListener("click", async (event) => {
+      const root = event.target.parentElement.parentElement;
+      const answerInput = root.querySelector(".answer-input");
+      const answerElement = root.querySelector(".answer");
+      const userAnswer = answerInput.value;
+
+      const isAnswerCorrect = await checkAnswer(
+        inputText,
+        translation,
+        userAnswer
+      );
+      console.log("Answer correctness:", isAnswerCorrect);
+
+      answerElement.classList.add(isAnswerCorrect ? "correct" : "incorrect");
+    });
+  translationDiv.appendChild(liveNode);
+  translationSection.appendChild(translationDiv);
+}
 // --- Camera Permission and Handling ---
 
 async function handleCameraButtonClick() {
@@ -225,9 +349,29 @@ async function startCameraStream() {
     });
     cameraVideo.srcObject = currentCameraStream;
     // Ensure the video plays when the stream is ready
-    cameraVideo.onloadedmetadata = () => {
-      cameraDialog.showModal();
-      console.log("Camera stream active and dialog shown.");
+    cameraVideo.onloadedmetadata = async () => {
+      const clipAnimation = setupSection.animate(
+        [{ clipPath: "circle(100%)" }, { clipPath: "circle(0%)" }],
+        {
+          duration: 1000,
+          easing: "ease-in-out",
+        }
+      );
+
+      await clipAnimation.finished;
+
+      setupSection.classList.add("complete");
+
+      const changeToToggle = document.startViewTransition(() => {
+        setupSection.classList.add("move");
+      });
+
+      await changeToToggle.finished;
+
+      const showCamera = document.startViewTransition(() => {
+        cameraDialog.showModal();
+        console.log("Camera stream active and dialog shown.");
+      });
     };
   } catch (error) {
     console.error("Error accessing camera:", error);
@@ -375,10 +519,10 @@ async function processImage(imageBlob) {
 
 function populateQuestions(questions) {
   if (!questions || questions.length === 0) {
-    questionSection.innerHTML = "<li>No questions generated.</li>";
+    questionDiv.innerHTML = "<li>No questions generated.</li>";
     return;
   }
-  questionSection.innerHTML = "";
+  questionDiv.innerHTML = "";
   questions.forEach((q, index) => {
     const li = document.createElement("li");
     li.style.viewTransitionName = `question${index}`; // Unique name for each question
@@ -391,8 +535,14 @@ function populateQuestions(questions) {
       const parent = event.target.parentElement;
       parent.style.viewTransitionName = `deleteQuestion`;
       document.startViewTransition(() => {
+        let questionIdx = 0;
+        let questionItr = parent;
+        while (questionItr.previousElementSibling) {
+          questionIdx++;
+          questionItr = questionItr.previousElementSibling;
+        }
         parent.remove();
-        currentQuestions.splice(index, 1); // Remove question from array
+        currentQuestions.splice(questionIdx, 1); // Remove question from array
         console.log("Question deleted:", q);
         // Optionally update the  or other UI elements
       });
@@ -401,7 +551,7 @@ function populateQuestions(questions) {
     li.appendChild(questionText);
     li.appendChild(deleteButton);
 
-    questionSection.appendChild(li);
+    questionDiv.appendChild(li);
     questionSection.className = "visible"; // Show questions section
   });
 }
@@ -466,7 +616,7 @@ async function getQuestions(description, imageBlob) {
 
   try {
     console.log("Sending description to LanguageModel for questions...");
-    const prompt = `You are helping a person learn a language. Generate 20 to 30 questions using following image and description in <description> that will help a ${proficiency} learner understand the content. The questions should be simple and clear.`;
+    const prompt = `You are helping a person who speaks ${proficiency} ${sourceLanguage} learn a language. Generate 20 to 30 questions in ${sourceLanguage} using the included image and description in <description> that will help a ${proficiency} language learner understand the content. The questions should be simple and clear, and a ${proficiency} should be able to answer them.`;
     const output = await languageModel.prompt(
       [
         { type: "text", content: prompt },
