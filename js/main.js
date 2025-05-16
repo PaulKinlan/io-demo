@@ -267,12 +267,13 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
     },
   });
 
-  const prompt = `The user is trying to answering the following question: '${questionSource}' in ${languageMap[targetLanguage]} language.
-
-  The question was translated as '${questionTranslated}'. 
+  const prompt = `The user is a ${proficiency} learning ${languageMap[targetLanguage]} and is trying to answer the provided question. 
   
-  Using the attached image and description (<description>) is the following answer (<answer>) provided by the user correct?
-  <answer lang='${targetLanguage}'>${providedAnswer}</answer>`;
+  Question (${languageMap[targetLanguage]}): ${questionTranslated}
+  
+  They're answer in (${languageMap[targetLanguage]}) is: ${providedAnswer}
+
+  Using the attached image and description (<description>) is the answer they provided correct?`;
 
   const output = await answerModel.prompt(
     [
@@ -282,7 +283,18 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
     ],
     {
       responseConstraint: {
-        type: "boolean",
+        type: "object",
+        properties: {
+          correct: {
+            type: "boolean",
+            description: "True if the answer is correct, false otherwise.",
+          },
+          reason: {
+            type: "string",
+            description:
+              "Explanation of the answer correctness. Help the user understand where they went wrong or could improve their answer. Tell them what the answer should have been if it can be determined",
+          },
+        },
         additionalProperties: false,
       },
     }
@@ -309,6 +321,7 @@ function addTranslationToUI(inputText, translation, idx) {
         <p>Question: ${inputText}</p>
       </div>
       <div class="correct"><p><img src="/images/tick.svg">Well done!</p></div>
+      <div class="reason"></div>    
     </div>
   </div>
   `;
@@ -326,18 +339,28 @@ function addTranslationToUI(inputText, translation, idx) {
     const root = event.target.parentElement.parentElement.parentElement;
     const answerInput = root.querySelector(".answer-input");
     const answerElement = root.querySelector(".answer");
+    const reasonElement = root.querySelector(".reason");
     const userAnswer = answerInput.value;
 
-    const isAnswerCorrect = await checkAnswer(
+    const { correct: isAnswerCorrect, reason } = await checkAnswer(
       inputText,
       translation,
       userAnswer
     );
     console.log("Answer correctness:", isAnswerCorrect);
 
-    document.startViewTransition(() => {
+    const isCorrectTransition = document.startViewTransition(() => {
       answerElement.classList.add(isAnswerCorrect ? "correct" : "incorrect");
+      if (isAnswerCorrect == false) {
+        reasonElement.innerText = reason;
+      }
     });
+
+    await isCorrectTransition.finished; // Wait for the transition to finish
+
+    root.parentElement.nextElementSibling.scrollIntoView({
+      container: "nearest",
+    }); // Show the answer
   };
 
   answerButton.addEventListener("click", answerInput);
