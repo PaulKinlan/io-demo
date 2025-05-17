@@ -1167,8 +1167,10 @@ button {
 #camera-dialog video {
   max-width: 100%;
   height: auto;
+  max-height: 80vh;
   display: block;
   width: 100%;
+  object-fit: cover;
 }
 
 #camera-dialog canvas {
