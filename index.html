@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Language Learning Tool</title>
   <link rel="stylesheet" href="css/style.css">
-  <script type="module" src="js/main.js" defer></script>
+  <script type="module" src="./js/main.js" defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 
@@ -34,21 +34,21 @@
           <option value="pt">🇵🇹 Portuguese</option>
         </select></label>
 
-      <button interesttarget="translator-status"><img src="/images/info.svg"></button>
+      <button interesttarget="translator-status"><img src="./images/info.svg"></button>
       <div popover="hint" id="translator-status"></div>
 
       <label for="proficiency">Proficiency: <select id="proficiency" name="proficiency" class="custom-select">
-          <option value="noob"><img src="/images/me.png"><span>Brit</span></option>
-          <option value="beginner" selected><img src="/images/school.svg"><span>Beginner</span></option>
-          <option value="intermediate"><img src="/images/owl.svg">Intermediate</option>
-          <option value="advanced"><img src="/images/school.svg">Advanced</option>
-          <option value="native"><img src="/images/cognition.svg">
+          <option value="noob"><img src="./images/me.png"><span>Brit</span></option>
+          <option value="beginner" selected><img src="./images/school.svg"><span>Beginner</span></option>
+          <option value="intermediate"><img src="./images/owl.svg">Intermediate</option>
+          <option value="advanced"><img src="./images/school.svg">Advanced</option>
+          <option value="native"><img src="./images/cognition.svg">
             Natural</option>
         </select></label>
 
       <div id="image-input">
         <button id="camera-button">
-          <img src="/images/camera.svg"> Capture
+          <img src="./images/camera.svg"> Capture
         </button>
         <permission type="camera microphone" id="camera-permission-element">
           Help
@@ -60,7 +60,7 @@
     <section id="learning-section">
       <div id="image-display">
       </div>
-      <button interesttarget="image-description"><img src="/images/info.svg"></button>
+      <button interesttarget="image-description"><img src="./images/info.svg"></button>
       <div popover="hint" id="image-description">
         <p id="description-text"></p>
       </div>
@@ -70,8 +70,8 @@
     <section id="question-section">
       <div id="questions"></div>
       <menu>
-        <button id="start"><img src="/images/go.svg"></button>
-        <button id="redo"><img src="/images/refresh.svg"></button>
+        <button id="start"><img src="./images/go.svg"></button>
+        <button id="redo"><img src="./images/refresh.svg"></button>
       </menu>
     </section>
 
@@ -85,7 +85,7 @@
     <video id="camera-video" autoplay playsinline></video>
     <canvas id="camera-canvas"></canvas> <!-- Hidden canvas -->
     <menu>
-      <button type="button" id="camera-capture-button"><img src="/images/camera.svg"></button>
+      <button type="button" id="camera-capture-button"><img src="./images/camera.svg"></button>
     </menu>
   </dialog>
 

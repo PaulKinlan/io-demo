@@ -1,8 +1,7 @@
 export default {
   // config options
-  base: "/io-demo/",
+  base: "./",
   build: {
-    base: "/io-demo/",
     outDir: "dist",
     assetDir: "assets",
   },
