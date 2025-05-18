@@ -939,26 +939,7 @@
       rgba(0, 255, 128, 0)
     ),
     radial-gradient(circle at bottom left, #adffd6, rgba(173, 255, 214, 0));
-  --noise-1: url(
-    data:image/svg + xml;charset=utf-8,
-    %3CsvgviewBox="0 0 200 200"xmlns="http://www.w3.org/2000/svg"%3E%3Cfilterid="a"%3E%3CfeTurbulencetype="fractalNoise"baseFrequency=".005"numOctaves="2"stitchTiles="stitch"/%3E%3C/filter%3E%3Crectwidth="100%25"height="100%25"filter="url(%23a)"/%3E%3C/svg%3E
-  );
-  --noise-2: url(
-    data:image/svg + xml;charset=utf-8,
-    %3CsvgviewBox="0 0 300 300"xmlns="http://www.w3.org/2000/svg"%3E%3Cfilterid="a"%3E%3CfeTurbulencetype="fractalNoise"baseFrequency=".05"stitchTiles="stitch"/%3E%3C/filter%3E%3Crectwidth="100%25"height="100%25"filter="url(%23a)"/%3E%3C/svg%3E
-  );
-  --noise-3: url(
-    data:image/svg + xml;charset=utf-8,
-    %3CsvgviewBox="0 0 1024 1024"xmlns="http://www.w3.org/2000/svg"%3E%3Cfilterid="a"%3E%3CfeTurbulencetype="fractalNoise"baseFrequency=".25"stitchTiles="stitch"/%3E%3C/filter%3E%3Crectwidth="100%25"height="100%25"filter="url(%23a)"/%3E%3C/svg%3E
-  );
-  --noise-4: url(
-    data:image/svg + xml;charset=utf-8,
-    %3CsvgviewBox="0 0 2056 2056"xmlns="http://www.w3.org/2000/svg"%3E%3Cfilterid="a"%3E%3CfeTurbulencetype="fractalNoise"baseFrequency=".5"stitchTiles="stitch"/%3E%3C/filter%3E%3Crectwidth="100%25"height="100%25"filter="url(%23a)"/%3E%3C/svg%3E
-  );
-  --noise-5: url(
-    data:image/svg + xml;charset=utf-8,
-    %3CsvgviewBox="0 0 2056 2056"xmlns="http://www.w3.org/2000/svg"%3E%3Cfilterid="a"%3E%3CfeTurbulencetype="fractalNoise"baseFrequency=".75"stitchTiles="stitch"/%3E%3C/filter%3E%3Crectwidth="100%25"height="100%25"filter="url(%23a)"/%3E%3C/svg%3E
-  );
+
   --noise-filter-1: contrast(300%) brightness(100%);
   --noise-filter-2: contrast(200%) brightness(150%);
   --noise-filter-3: contrast(200%) brightness(250%);
