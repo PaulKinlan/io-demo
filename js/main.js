@@ -319,10 +319,10 @@ function addTranslationToUI(inputText, translation, idx) {
     </div>
     <div class="answer"><!-- answer.correct / answer.incorrect -->
       <div class="incorrect">
-        <p><img src="/images/wrong.svg"> Incorrect</p>
+        <p><img src="./images/wrong.svg"> Incorrect</p>
         <p>Question: ${inputText}</p>
       </div>
-      <div class="correct"><p><img src="/images/tick.svg">Well done!</p></div>
+      <div class="correct"><p><img src="./images/tick.svg">Well done!</p></div>
       <div class="reason"></div>    
     </div>
   </div>
