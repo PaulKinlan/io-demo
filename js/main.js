@@ -376,13 +376,13 @@ function addTranslationToUI(inputText, translation, idx) {
 async function handleCameraButtonClick() {
   console.log("Camera button clicked");
 
-  const cameraPermission = await checkCameraPermission();
-  const microphonePermission = await checkMicrophonePermission();
+  // const cameraPermission = await checkCameraPermission();
+  // const microphonePermission = await checkMicrophonePermission();
 
-  if (cameraPermission && microphonePermission == false) {
-    console.log("Camera and microphone permissions not granted.");
-    return;
-  }
+  // if (cameraPermission && microphonePermission == false) {
+  //   console.log("Camera and microphone permissions not granted.");
+  //   return;
+  // }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert("Camera access (getUserMedia) is not supported by your browser.");
@@ -402,17 +402,17 @@ async function startCameraStream() {
     cameraVideo.srcObject = currentCameraStream;
     // Ensure the video plays when the stream is ready
     cameraVideo.onloadedmetadata = async () => {
-      const clipAnimation = setupSection.animate(
-        [{ clipPath: "circle(100%)" }, { clipPath: "circle(0%)" }],
-        {
-          duration: 1000,
-          easing: "ease-in-out",
-        }
-      );
+      // const clipAnimation = setupSection.animate(
+      //   [{ clipPath: "circle(100%)" }, { clipPath: "circle(0%)" }],
+      //   {
+      //     duration: 1000,
+      //     easing: "ease-in-out",
+      //   }
+      // );
 
-      await clipAnimation.finished;
+      // await clipAnimation.finished;
 
-      setupSection.classList.add("complete");
+      //setupSection.classList.add("complete");
 
       const changeToToggle = document.startViewTransition(() => {
         setupSection.classList.add("move");

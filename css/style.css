@@ -1036,8 +1036,8 @@ h1 {
 /* Layout */
 main {
   max-width: 900px;
-  margin: 2rem auto;
-  padding: 1rem;
+  max-width: 900px;
+  margin: auto;
 }
 
 section {
@@ -1203,12 +1203,13 @@ section#setup-section {
     clip-path: circle(0%);
   }
   &.move {
-    position: absolute;
+    display: none;
+    /* position: absolute;
     clip-path: circle(20%);
     top: 0;
     right: 0;
     content: url(/images/config.svg);
-    background-color: rgb(146, 143, 143);
+    background-color: rgb(146, 143, 143); */
   }
 }
 
@@ -1240,8 +1241,8 @@ section#translation-section {
   font-size: var(--font-size-2);
   scroll-marker-group: before;
   list-style-type: none;
-  padding: 0;
-  scroll-padding: 0;
+  padding: 1em;
+  scroll-padding: 1em;
   display: grid;
   grid-auto-flow: column;
   gap: var(--size-5);
@@ -1306,6 +1307,15 @@ section#translation-section {
         &.correct {
           .correct {
             display: block;
+            img {
+              margin-right: 1em;
+              height: 4em;
+              width: 4em;
+            }
+            p {
+              display: flex;
+              align-items: center;
+            }
           }
 
           .incorrect {
@@ -1320,6 +1330,16 @@ section#translation-section {
 
           .incorrect {
             display: block;
+
+            img {
+              margin-right: 1em;
+              height: 4em;
+              width: 4em;
+            }
+            p {
+              display: flex;
+              align-items: center;
+            }
           }
         }
       }
@@ -1884,7 +1904,11 @@ permission {
   justify-content: center;
 }
 
-#camera-button:not(:has(~ permission:granted)) {
+/* #camera-button:not(:has(~ permission:granted)) {
+  display: none;
+} */
+
+permission {
   display: none;
 }
 
