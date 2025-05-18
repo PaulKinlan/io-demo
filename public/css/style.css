@@ -1366,14 +1366,14 @@ section#translation-section {
   &::scroll-button(right) {
     position-area: center end;
     content: "arrow_forward" / "Next";
-    background: url(./images/chevron-right.svg) no-repeat center, var(--gray-4);
+    background: url(../images/chevron-right.svg) no-repeat center, var(--gray-4);
     background-size: cover;
   }
 
   &::scroll-button(left) {
     position-area: center start;
     content: "arrow_back" / "Previous";
-    background: url(./images/chevron-left.svg) no-repeat center, var(--gray-4);
+    background: url(../images/chevron-left.svg) no-repeat center, var(--gray-4);
     background-size: cover;
   }
 
