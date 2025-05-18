@@ -402,18 +402,6 @@ async function startCameraStream() {
     cameraVideo.srcObject = currentCameraStream;
     // Ensure the video plays when the stream is ready
     cameraVideo.onloadedmetadata = async () => {
-      // const clipAnimation = setupSection.animate(
-      //   [{ clipPath: "circle(100%)" }, { clipPath: "circle(0%)" }],
-      //   {
-      //     duration: 1000,
-      //     easing: "ease-in-out",
-      //   }
-      // );
-
-      // await clipAnimation.finished;
-
-      //setupSection.classList.add("complete");
-
       const changeToToggle = document.startViewTransition(() => {
         setupSection.classList.add("move");
       });
