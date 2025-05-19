@@ -1341,15 +1341,15 @@ section#translation-section {
         background: var(--link);
         border-color: var(--link);
       }
+    }
 
-      .incorrect:target-current {
-        background: var(--red-5);
-        border-color: var(--red-5);
-      }
-      .correct:target-current {
-        background: var(--green-5);
-        border-color: var(--green-5);
-      }
+    .incorrect::scroll-marker:target-current {
+      background: var(--red-5);
+      border-color: var(--red-5);
+    }
+    .correct::scroll-marker:target-current {
+      background: var(--green-5);
+      border-color: var(--green-5);
     }
   }
 
