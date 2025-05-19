@@ -1351,12 +1351,12 @@ section#translation-section {
     inline-size: 50px;
     block-size: 50px;
     backdrop-filter: blur(10px);
-    border: solid 1px var(--gray-6);
+    border: none;
     color: black;
     cursor: pointer;
     position: fixed;
     position-anchor: --carousel;
-    margin: -2em;
+    margin: -3em;
     border-radius: 50%;
     transition: transform 0.3s var(--ease-spring-3), opacity 0.5s var(--ease-3),
       outline-offset 0.25s var(--ease-3);
@@ -1366,14 +1366,16 @@ section#translation-section {
   &::scroll-button(right) {
     position-area: center end;
     content: "arrow_forward" / "Next";
-    background: url(../images/chevron-right.svg) no-repeat center, var(--gray-4);
+    background: url(../images/chevron-right.svg) no-repeat center,
+      oklch(from var(--gray-4) l c h / calc(alpha - 0.6));
     background-size: cover;
   }
 
   &::scroll-button(left) {
     position-area: center start;
     content: "arrow_back" / "Previous";
-    background: url(../images/chevron-left.svg) no-repeat center, var(--gray-4);
+    background: url(../images/chevron-left.svg) no-repeat center,
+      oklch(from var(--gray-4) l c h / calc(alpha - 0.6));
     background-size: cover;
   }
 

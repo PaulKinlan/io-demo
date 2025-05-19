@@ -353,7 +353,7 @@ function addTranslationToUI(inputText, translation, idx) {
 
     const isCorrectTransition = document.startViewTransition(() => {
       answerElement.classList.add(isAnswerCorrect ? "correct" : "incorrect");
-      if (isAnswerCorrect == false) {
+      if (isAnswerCorrect == false && reason != undefined) {
         reasonElement.innerText = reason;
       }
     });
