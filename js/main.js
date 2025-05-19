@@ -336,8 +336,10 @@ function addTranslationToUI(inputText, translation, idx) {
   const answerButton = liveNode.querySelector(".check-answer-button");
   const answerForm = liveNode.querySelector("form");
 
-  const answerInput = async (event) => {
+  const processAnswer = async (event) => {
     event.preventDefault(); // Prevent form submission
+    event.stopPropagation(); // Stop event propagatione
+    event.target.disabled = true; // Disable the button to prevent multiple clicks
     const root = event.target.parentElement.parentElement.parentElement;
     const answerInput = root.querySelector(".answer-input");
     const answerElement = root.querySelector(".answer");
@@ -349,6 +351,7 @@ function addTranslationToUI(inputText, translation, idx) {
       translation,
       userAnswer
     );
+
     console.log("Answer correctness:", isAnswerCorrect);
 
     const isCorrectTransition = document.startViewTransition(() => {
@@ -365,8 +368,8 @@ function addTranslationToUI(inputText, translation, idx) {
     }); // Show the answer
   };
 
-  answerButton.addEventListener("click", answerInput);
-  answerForm.addEventListener("submit", answerInput);
+  answerButton.addEventListener("click", processAnswer);
+  answerForm.addEventListener("submit", processAnswer);
 
   translationDiv.appendChild(liveNode);
   translationSection.appendChild(translationDiv);

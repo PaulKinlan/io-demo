@@ -1257,17 +1257,23 @@ section#translation-section {
           grid-area: question;
         }
 
-        input {
-          grid-area: input;
-          background: transparent;
-          font-size: inherit;
-          border: none;
-          border-bottom: 1px solid var(--gray-6);
-        }
-        button {
-          grid-area: button;
-          width: fit-content;
-          place-self: end;
+        form {
+          display: flex;
+          gap: 1em;
+
+          input {
+            grid-area: input;
+            background: transparent;
+            font-size: inherit;
+            border: none;
+            border-bottom: 1px solid var(--gray-6);
+            flex: 1;
+          }
+          button {
+            grid-area: button;
+            width: fit-content;
+            place-self: end;
+          }
         }
       }
 
@@ -1739,6 +1745,10 @@ section#question-section {
 #answer-dialog form {
   display: flex;
   flex-direction: column;
+}
+
+.text-question .question forminput[type="text"] {
+  flex: 1;
 }
 
 #answer-dialog textarea {
