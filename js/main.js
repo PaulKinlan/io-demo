@@ -44,6 +44,7 @@ const languageMap = {
   de: "German",
   it: "Italian",
   jp: "Japanese",
+  cy: "Welsh",
 };
 
 // --- Initialization ---
