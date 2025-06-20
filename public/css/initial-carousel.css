@@ -6,7 +6,7 @@ body {
 }
 
 section.carousel {
-  --display: grid;
+  /* display: grid; */
   grid-auto-flow: column;
   height: 80vh;
   border: solid 1px #ffcba4;
@@ -19,8 +19,8 @@ section.carousel {
   margin: auto;
   anchor-name: --carousel;
 
-  --scroll-behavior: smooth;
-  --scroll-snap-type: x mandatory;
+  /* scroll-behavior: smooth;
+  scroll-snap-type: x mandatory; */
   scrollbar-width: none;
   scroll-padding: 1rem;
 

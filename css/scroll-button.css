@@ -1,0 +1,29 @@
+.carousel {
+  &::scroll-button(*) {
+    inline-size: 50px;
+    block-size: 50px;
+    background-color: transparent;
+    border: 1px solid black;
+    backdrop-filter: blur(10px);
+    color: black;
+    cursor: pointer;
+    position: absolute;
+    position-anchor: --carousel;
+    margin: -3em;
+    border-radius: 50%;
+  }
+
+  &::scroll-button(*):disabled {
+    content: " ";
+  }
+
+  &::scroll-button(left) {
+    content: "⬅" / "Scroll Left";
+    position-area: center start;
+  }
+
+  &::scroll-button(right) {
+    content: "⮕" / "Scroll Right";
+    position-area: center end;
+  }
+}

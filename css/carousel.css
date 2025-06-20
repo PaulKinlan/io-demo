@@ -1,0 +1,48 @@
+@--import url("/css/scroll-button.css");
+@--import url("/css/scroll-marker-group.css");
+@--import url("/css/scroll-marker.css");
+
+html,
+body {
+  height: 100%;
+  margin: 1em;
+  padding: em;
+}
+
+section.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  height: 80vh;
+  border: solid 1px black;
+  border-radius: 1rem;
+  margin: 1rem;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-x: auto;
+  width: 80vw;
+  margin: auto;
+  anchor-name: --carousel;
+
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  scroll-padding: 1rem;
+  container-type: inline-size;
+
+  div.card {
+    border-radius: 20px;
+    width: 100cqi;
+    background-color: oklch(from #ffcba4 calc(l * 0.75) c h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10rem;
+    overflow: hidden;
+
+    scroll-snap-stop: always;
+    scroll-snap-align: start;
+  }
+  img {
+    width: 100%;
+  }
+}

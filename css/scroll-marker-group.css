@@ -1,0 +1,22 @@
+section.carousel {
+  scroll-marker-group: after;
+
+  &::scroll-marker-group {
+    inline-size: 80%;
+    margin: auto;
+    display: grid;
+    place-content: safe center;
+    align-items: center;
+    grid: 30px / auto-flow 30px;
+    gap: 15px;
+    padding: 15px;
+    scroll-padding: 15px;
+    overflow: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    border: solid 1px #ffcba4;
+    margin-top: 1em;
+    border-radius: 1em;
+  }
+}

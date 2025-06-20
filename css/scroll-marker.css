@@ -1,0 +1,19 @@
+section.carousel {
+  div.card {
+    &::scroll-marker {
+      content: " ";
+      background-color: oklch(from #ffcba4 calc(l * 0.75) c h);
+      border: solid 1px oklch(from #ffcba4 calc(l * 0.75) c h);
+      height: 1rem;
+      width: 1rem;
+      scroll-snap-align: start;
+      border-radius: 50%;
+      place-self: center;
+    }
+
+    &::scroll-marker:target-current {
+      width: 3rem;
+      border-radius: 1em;
+    }
+  }
+}
