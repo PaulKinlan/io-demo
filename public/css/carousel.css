@@ -6,7 +6,7 @@ body {
 }
 
 section.carousel {
-  display: grid;
+  --display: grid;
   grid-auto-flow: column;
   height: 80vh;
   border: solid 1px #ffcba4;
@@ -19,12 +19,14 @@ section.carousel {
   margin: auto;
   anchor-name: --carousel;
 
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+  --scroll-behavior: smooth;
+  --scroll-snap-type: x mandatory;
   scrollbar-width: none;
   scroll-padding: 1rem;
 
   container-type: inline-size;
+
+  /*
 
   &::scroll-button(*) {
     inline-size: 50px;
@@ -52,9 +54,9 @@ section.carousel {
   &::scroll-button(right) {
     content: "⮕" / "Scroll Right";
     position-area: center end;
-  }
+  } */
 
-  scroll-marker-group: after;
+  /* scroll-marker-group: after;
 
   &::scroll-marker-group {
     inline-size: 80%;
@@ -74,6 +76,7 @@ section.carousel {
     margin-top: 1em;
     border-radius: 1em;
   }
+  */
 
   div.card {
     border-radius: 20px;
@@ -85,9 +88,12 @@ section.carousel {
     font-size: 10rem;
     overflow: hidden;
 
+    /*
     scroll-snap-stop: always;
     scroll-snap-align: start;
+    */
 
+    /*
     &::scroll-marker {
       content: " ";
       background-color: oklch(from #ffcba4 calc(l * 0.75) c h);
@@ -99,10 +105,12 @@ section.carousel {
       place-self: center;
     }
 
+
     &::scroll-marker:target-current {
       width: 3rem;
       border-radius: 1em;
     }
+      */
   }
   img {
     width: 100%;
