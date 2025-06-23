@@ -280,9 +280,13 @@ async function checkAnswer(questionSource, questionTranslated, providedAnswer) {
 
   const output = await answerModel.prompt(
     [
-      { type: "text", content: prompt },
-      { type: "image", content: await createImageBitmap(currentImageBlob) },
-      { type: "text", content: description },
+      { type: "text", role: "system", content: prompt },
+      {
+        type: "image",
+        role: "system",
+        content: await createImageBitmap(currentImageBlob),
+      },
+      { type: "text", role: "user", content: description },
     ],
     {
       responseConstraint: {
@@ -623,7 +627,7 @@ async function getImageDescription(imageBlob) {
     }
 
     languageModel = await LanguageModel.create({
-      expectedInputs: [{ type: "image" }],
+      expectedInputs: [{ type: "image" }, { type: "text" }],
       monitor(m) {
         m.addEventListener("downloadprogress", (e) => {
           console.log(
@@ -635,8 +639,17 @@ async function getImageDescription(imageBlob) {
 
     // Pass the Blob directly in the content array
     const output = await languageModel.prompt([
-      "describe this image",
-      { type: "image", content: await createImageBitmap(imageBlob) }, // Pass Blob in array
+      { role: "system", content: "You are an image description model." },
+      {
+        role: "user",
+        content: [
+          {
+            type: "image",
+            value: await createImageBitmap(imageBlob),
+          },
+          { role: "user", value: "describe this image", type: "text" },
+        ],
+      },
     ]);
     console.log("LanguageModel description output:", output);
     return output; // Return the raw output from the model
@@ -663,11 +676,20 @@ async function getQuestions(description, imageBlob) {
     Generate 20 to 30 questions in ${languageMap[sourceLanguage]} about the included image and description in <description>. The questions should be simple, clear and be something a ${proficiency} learner can answer.`;
     const output = await languageModel.prompt(
       [
-        { type: "text", content: prompt },
-        { type: "image", content: await createImageBitmap(imageBlob) },
-        { type: "text", content: `<description>${description}</description>` },
+        { type: "text", role: "system", content: prompt },
+        {
+          type: "image",
+          content: await createImageBitmap(imageBlob),
+          role: "system",
+        },
         {
           type: "text",
+          role: "system",
+          content: `<description>${description}</description>`,
+        },
+        {
+          type: "text",
+          role: "user",
           content: `The questions MUST be in ${languageMap[sourceLanguage]}`,
         },
       ],
