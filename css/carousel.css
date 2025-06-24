@@ -9,10 +9,18 @@ body {
   padding: em;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
 section.carousel {
   display: grid;
   grid-auto-flow: column;
-  height: 80vh;
+  height: 60vh;
   border: solid 1px black;
   border-radius: 1rem;
   margin: 1rem;
