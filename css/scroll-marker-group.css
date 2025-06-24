@@ -3,6 +3,7 @@ section.carousel {
 
   &::scroll-marker-group {
     inline-size: 80%;
+    background-color: #ffcba4;
     margin: auto;
     display: grid;
     place-content: safe center;

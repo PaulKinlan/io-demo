@@ -4,12 +4,12 @@
 
 html,
 body {
-  height: 100%;
-  margin: 1em;
-  padding: em;
+  margin: 0;
+  padding: 0;
 }
 
-body {
+html {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,12 +23,10 @@ section.carousel {
   height: 60vh;
   border: solid 1px black;
   border-radius: 1rem;
-  margin: 1rem;
   gap: 1rem;
   padding: 1rem;
   overflow-x: auto;
   width: 80vw;
-  margin: auto;
   anchor-name: --carousel;
 
   scroll-behavior: smooth;
