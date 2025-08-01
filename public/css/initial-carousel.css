@@ -8,14 +8,13 @@ body {
 section.carousel {
   /* display: grid; */
   grid-auto-flow: column;
-  height: 80vh;
   border: solid 1px #ffcba4;
   border-radius: 1rem;
   margin: 1rem;
   gap: 1rem;
   padding: 1rem;
   overflow-x: auto;
-  width: 80vw;
+  width: clamp(300px, 80vw, 800px);
   margin: auto;
   anchor-name: --carousel;
 
