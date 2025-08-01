@@ -3,7 +3,6 @@ section.carousel {
 
   &::scroll-marker-group {
     inline-size: 80%;
-    background-color: #ffcba4;
     margin: auto;
     display: grid;
     place-content: safe center;
@@ -16,7 +15,7 @@ section.carousel {
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     scroll-snap-type: x mandatory;
-    border: solid 1px #ffcba4;
+    border: solid 1px black;
     margin-top: 1em;
     border-radius: 1em;
   }
