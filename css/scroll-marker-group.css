@@ -1,4 +1,6 @@
-section.carousel {
+@import url("/css/scroll-marker.css");
+
+--section.carousel {
   scroll-marker-group: after;
 
   &::scroll-marker-group {

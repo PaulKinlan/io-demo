@@ -1,4 +1,6 @@
-.carousel {
+@import url("/css/scroll-marker-group.css");
+
+--.carousel {
   &::scroll-button(*) {
     inline-size: 50px;
     block-size: 50px;
